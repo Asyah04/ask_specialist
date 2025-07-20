@@ -93,11 +93,8 @@ ob_start();
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="mb-0">All Users</h5>
-                    <a href="add_user.php" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add New User
-                    </a>
                 </div>
                 <div class="card-body">
                     <?php if(isset($_SESSION['success'])): ?>

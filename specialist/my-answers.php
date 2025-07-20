@@ -85,7 +85,7 @@ ob_start();
                                         </div>
                                     </div>
                                     <div class="mt-2">
-                                        <a href="../question.php?id=<?php echo $question['id']; ?>" class="btn btn-sm btn-primary">
+                                        <a href="../view_question.php?id=<?php echo $question['id']; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye me-1"></i> View Full Question
                                         </a>
                                     </div>

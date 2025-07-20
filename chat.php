@@ -41,8 +41,9 @@ ob_start();
 
 <style>
     .chat-container {
-        max-width: 800px;
-        margin: 20px auto;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
         background: #fff;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);

@@ -14,17 +14,20 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color:rgb(85, 80, 83); /* Hot Pink */
-            --secondary-color:rgb(35, 32, 32); /* Light Pink */
-            --accent-color:rgb(0, 0, 0); /* Deep Pink */
-            --light-bg: #FFF0F5; /* Lavender Blush */
-            --dark-bg:rgb(33, 15, 21); /* Pale Violet Red */
-            --text-color: #4A4A4A; /* Dark Gray for text */
+            --primary-color: #fff;
+            --secondary-color: #f8f9fa;
+            --accent-color: #1976d2;
+            --light-bg: #fff;
+            --dark-bg: #222;
+            --text-color: #222;
+            --gradient-primary: #fff;
+            --gradient-secondary: #fff;
+            --gradient-accent: #fff;
         }
 
         body {
             overflow-x: hidden;
-            background-color: var(--light-bg);
+            background-color: var(--secondary-color);
             color: var(--text-color);
         }
         /* Hide scrollbar for Chrome, Safari and Opera */
@@ -45,8 +48,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             left: 0;
             z-index: 100;
             padding: 48px 0 0;
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+            box-shadow: 1px 0 0 rgba(0,0,0,0.04);
+            background: #fff;
             width: 240px;
             transition: all 0.3s;
         }
@@ -59,12 +62,30 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             overflow-y: auto;
         }
         .navbar {
-            background: linear-gradient(to right, var(--primary-color), var(--accent-color)) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+            background: linear-gradient(90deg,rgb(119, 166, 213) 0%, #125ea2 100%) !important;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             height: 60px;
             position: fixed;
             width: 100%;
             z-index: 1000;
+        }
+        .navbar .navbar-brand,
+        .navbar .text-light,
+        .navbar .ms-auto,
+        .navbar .ms-auto span,
+        .navbar .ms-auto a,
+        .navbar .badge {
+            color: #fff !important;
+        }
+        .navbar .btn-outline-danger {
+            color: #fff;
+            border-color: #fff;
+        }
+        .navbar .btn-outline-danger:hover {
+            background: #fff;
+            color: #1976d2;
+            border-color: #fff;
         }
         .main-content {
             margin-left: 240px;
@@ -76,18 +97,20 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             transition: all 0.3s;
         }
         .nav-link {
-            color: #fff;
+            color: #222;
             padding: 10px 20px;
             transition: all 0.3s ease;
         }
         .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background-color: #f0f4fa;
+            color: #1976d2;
             transform: translateX(5px);
+            border-left: 3px solid #1976d2;
         }
         .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.3);
-            color: white;
+            background-color: #f0f4fa;
+            color: #1976d2;
+            border-left: 4px solid #1976d2;
         }
         /* Common container styles */
         .question-container,
@@ -113,8 +136,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         .page-title {
             margin-bottom: 1.5rem;
             padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--secondary-color);
-            color: var(--accent-color);
+            border-bottom: 2px solid #1976d2;
+            color: #1976d2;
         }
         .container {
             max-width: 100%;
@@ -126,22 +149,23 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         .card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.1);
+            box-shadow: 0 4px 15px rgba(77, 182, 172, 0.1);
             transition: all 0.3s ease;
             margin-bottom: 20px;
             overflow: hidden;
             height: 100%;
             display: flex;
             flex-direction: column;
-            background-color: #fff;
+            background: #fff;
+            border-top: 3px solid #1976d2;
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.2);
         }
         .card-header {
-            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-            color: #fff;
+            background: #fff;
+            color: #1976d2;
             border-bottom: none;
             padding: 15px 20px;
             flex-shrink: 0; /* Prevent header from shrinking */
@@ -160,9 +184,9 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
         /* Statistics Cards */
         .stats-card {
-            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            background: var(--gradient-primary);
             color: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             transition: all 0.3s ease;
@@ -170,10 +194,11 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             display: flex;
             flex-direction: column;
             justify-content: center;
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.2);
         }
         .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(77, 182, 172, 0.25);
         }
         .stats-card h2 {
             font-size: 2.5rem;
@@ -190,14 +215,65 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             margin-bottom: 0;
         }
         .table th {
-            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            background: var(--gradient-secondary);
             color: white;
+            border: none;
         }
         .table td {
             vertical-align: middle;
         }
         .table-hover tbody tr {
             transition: all 0.2s ease;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(77, 182, 172, 0.08);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: #1976d2;
+            border: none;
+            box-shadow: 0 4px 15px rgba(77, 182, 172, 0.2);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #125ea2;
+            border-color: #125ea2;
+        }
+        .btn-outline-primary {
+            color: #1976d2;
+            border-color: #1976d2;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary:hover {
+            background: #1976d2;
+            color: #fff;
+        }
+        
+        /* Form Styles */
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(77, 182, 172, 0.2);
+        }
+        
+        /* Badge Styles */
+        .badge {
+            font-weight: 500;
+        }
+        .bg-primary {
+            background: var(--gradient-primary) !important;
+        }
+        .bg-success {
+            background: #1976d2 !important;
+        }
+        .bg-info {
+            background: linear-gradient(135deg, #80CBC4 0%, #4DB6AC 100%) !important;
+        }
+        .bg-warning {
+            background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%) !important;
+        }
+        .bg-danger {
+            background: linear-gradient(135deg, #F44336 0%, #E91E63 100%) !important;
         }
         .table-hover tbody tr:hover {
             background-color: var(--light-bg);
@@ -217,12 +293,12 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
         /* List Group Animations */
         .list-group-item {
-            border: 1px solid rgba(255, 105, 180, 0.1);
+            border: 1px solid #e3e6ea;
             margin-bottom: 5px;
             border-radius: 8px !important;
         }
         .list-group-item:hover {
-            background-color: var(--light-bg);
+            background-color: #f0f4fa;
             transform: translateX(5px);
         }
 
@@ -380,13 +456,13 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         }
 
         .btn-success {
-            background-color: var(--dark-bg);
-            border-color: var(--dark-bg);
+            background-color: #1976d2;
+            border-color: #1976d2;
         }
 
         .btn-success:hover {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
+            background-color: #125ea2;
+            border-color: #125ea2;
         }
 
         .badge.bg-primary {
@@ -394,7 +470,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         }
 
         .badge.bg-success {
-            background-color: var(--dark-bg) !important;
+            background-color: #1976d2 !important;
         }
 
         .badge.bg-info {
@@ -451,11 +527,11 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         }
 
         a {
-            color: var(--primary-color);
+            color: #1976d2;
         }
 
         a:hover {
-            color: var(--accent-color);
+            color: #125ea2;
         }
 
         .btn-group .btn-outline-primary {
@@ -499,18 +575,18 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
         /* Update active navigation items styles */
         .sidebar .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.3);
-            color: white;
-            border-right: 3px solid white;
+            background-color: #f0f4fa;
+            color: #1976d2;
+            border-right: 3px solid #1976d2;
             font-weight: 500;
         }
 
         .sidebar .nav-link.active i {
-            color: white;
+            color: #1976d2;
         }
 
         .sidebar .nav-link i {
-            color: rgba(255, 255, 255, 0.8);
+            color: #1976d2;
         }
     </style>
 </head>
@@ -527,8 +603,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             <div class="ms-auto">
                 <span class="me-3">Welcome, <?php echo htmlspecialchars($_SESSION["username"]); ?></span>
                 <span class="badge bg-<?php 
-                    echo $_SESSION["role"] === "admin" ? "danger" : 
-                        ($_SESSION["role"] === "specialist" ? "success" : "primary"); 
+                    echo $_SESSION["role"] === "admin" ? "bg-primary" : 
+                        ($_SESSION["role"] === "specialist" ? "bg-success" : "bg-primary"); 
                 ?> me-3"><?php echo ucfirst(htmlspecialchars($_SESSION["role"])); ?></span>
                 <a href="<?php 
                     if ($_SESSION["role"] === "admin") {

@@ -32,6 +32,8 @@ $sql = "SELECT COUNT(*) as total FROM questions";
 $result = mysqli_query($conn, $sql);
 $stats['total_questions'] = mysqli_fetch_assoc($result)['total'];
 
+
+
 // Recent applications
 $sql = "SELECT sa.*, u.username, u.email 
         FROM specialist_applications sa 
@@ -54,159 +56,127 @@ $page_title = "Admin Dashboard";
 ob_start();
 ?>
 
-<div class="container">
-    <!-- Statistics Cards -->
-    <div class="row equal-height mb-4">
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg,rgb(175, 179, 250) 0%,rgb(170, 174, 248) 100%);">
-                <div class="stats-icon">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <div class="stats-info">
-                    <h5 class="card-title">Total Students</h5>
-                    <h2><?php echo $stats['total_students']; ?></h2>
-                    <p>Registered Students</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg,rgb(249, 163, 163) 0%,rgb(251, 169, 173) 100%);">
-                <div class="stats-icon">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <div class="stats-info">
-                    <h5 class="card-title">Total Specialists</h5>
-                    <h2><?php echo $stats['total_specialists']; ?></h2>
-                    <p>Active Specialists</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg,rgb(160, 207, 249) 0%,rgb(150, 242, 247) 100%);">
-                <div class="stats-icon">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="stats-info">
-                    <h5 class="card-title">Pending Applications</h5>
-                    <h2><?php echo $stats['pending_applications']; ?></h2>
-                    <p>Awaiting Review</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="stats-card" style="background: linear-gradient(135deg,rgb(165, 247, 192) 0%,rgb(153, 250, 233) 100%);">
-                <div class="stats-icon">
-                    <i class="fas fa-question-circle"></i>
-                </div>
-                <div class="stats-info">
-                    <h5 class="card-title">Total Questions</h5>
-                    <h2><?php echo $stats['total_questions']; ?></h2>
-                    <p>Questions Asked</p>
+<div class="container py-5">
+    <!-- Kisasa: Header ya Admin -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow border-0 bg-gradient-primary text-white" style="background: linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%);">
+                <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between">
+                    <div>
+                        <h3 class="card-title mb-1 fw-bold">Welcome, <?php echo htmlspecialchars($_SESSION["username"]); ?>!</h3>
+                        <p class="card-text mb-0">You are logged in as <span class="fw-semibold">Admin</span></p>
+                    </div>
+                    <img src="https://img.icons8.com/color/96/000000/admin-settings-male.png" alt="Admin" class="ms-md-4 d-none d-md-block" style="height:60px;">
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row equal-height">
-        <!-- Recent Applications -->
+    <!-- Statistics Cards -->
+    <div class="row mb-4 g-3">
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-people-fill fs-2 text-primary"></i></div>
+                    <h6 class="card-title text-muted">Total Students</h6>
+                    <h2 class="fw-bold"><?php echo $stats['total_students']; ?></h2>
+                    <p class="text-muted mb-0">Registered Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-person-badge-fill fs-2 text-success"></i></div>
+                    <h6 class="card-title text-muted">Total Specialists</h6>
+                    <h2 class="fw-bold"><?php echo $stats['total_specialists']; ?></h2>
+                    <p class="text-muted mb-0">Active Specialists</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-hourglass-split fs-2 text-warning"></i></div>
+                    <h6 class="card-title text-muted">Pending Applications</h6>
+                    <h2 class="fw-bold"><?php echo $stats['pending_applications']; ?></h2>
+                    <p class="text-muted mb-0">Awaiting Review</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 text-center h-100">
+                <div class="card-body">
+                    <div class="mb-2"><i class="bi bi-question-circle-fill fs-2 text-info"></i></div>
+                    <h6 class="card-title text-muted">Total Questions</h6>
+                    <h2 class="fw-bold"><?php echo $stats['total_questions']; ?></h2>
+                    <p class="text-muted mb-0">Questions Asked</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Applications
         <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Recent Applications</h5>
+            <div class="card shadow border-0 h-100">
+                <div class="card-header bg-transparent border-bottom-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-semibold"><i class="bi bi-file-earmark-person me-2"></i>Recent Applications</h5>
                     <a href="applications.php" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-body">
                     <?php if(mysqli_num_rows($recent_applications) > 0): ?>
-                        <div class="list-group">
+                        <ul class="list-group list-group-flush">
                             <?php while($app = mysqli_fetch_assoc($recent_applications)): ?>
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-1"><?php echo htmlspecialchars($app['username']); ?></h6>
-                                            <small class="text-muted"><?php echo htmlspecialchars($app['email']); ?></small>
-                                        </div>
-                                        <a href="review_application.php?id=<?php echo $app['id']; ?>" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye me-1"></i> Review
-                                        </a>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold"><?php echo htmlspecialchars($app['username']); ?></h6>
+                                        <small class="text-muted"><?php echo htmlspecialchars($app['email']); ?></small>
                                     </div>
-                                </div>
+                                    <a href="review_application.php?id=<?php echo $app['id']; ?>" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i> Review
+                                    </a>
+                                </li>
                             <?php endwhile; ?>
-                        </div>
+                        </ul>
                     <?php else: ?>
                         <p class="text-muted mb-0">No pending applications</p>
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Recent Questions -->
-        <div class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Recent Questions</h5>
+        <!-- <div class="col-md-6 mb-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-header bg-transparent border-bottom-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-semibold"><i class="bi bi-question-circle me-2"></i>Recent Questions</h5>
                     <a href="questions.php" class="btn btn-sm btn-primary">View All</a>
                 </div>
                 <div class="card-body">
                     <?php if(mysqli_num_rows($recent_questions) > 0): ?>
-                        <div class="list-group">
+                        <ul class="list-group list-group-flush">
                             <?php while($question = mysqli_fetch_assoc($recent_questions)): ?>
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-1"><?php echo htmlspecialchars($question['title']); ?></h6>
-                                            <small class="text-muted">
-                                                By <?php echo htmlspecialchars($question['username']); ?> in 
-                                                <?php echo htmlspecialchars($question['category_name']); ?>
-                                            </small>
-                                        </div>
-                                        <a href="../view_question.php?id=<?php echo $question['id']; ?>" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye me-1"></i> View
-                                        </a>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1 fw-semibold"><?php echo htmlspecialchars($question['title']); ?></h6>
+                                        <small class="text-muted">
+                                            By <?php echo htmlspecialchars($question['username']); ?> in 
+                                            <?php echo htmlspecialchars($question['category_name']); ?>
+                                        </small>
                                     </div>
-                                </div>
+                                    <a href="../view_question.php?id=<?php echo $question['id']; ?>" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye me-1"></i> View
+                                    </a>
+                                </li>
                             <?php endwhile; ?>
-                        </div>
+                        </ul>
                     <?php else: ?>
                         <p class="text-muted mb-0">No questions yet</p>
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row equal-height">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row equal-height">
-                        <div class="col-md-3 mb-3">
-                            <a href="users.php" class="btn btn-outline-primary w-100">
-                                <i class="fas fa-users me-2"></i> Manage Users
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="applications.php" class="btn btn-outline-warning w-100">
-                                <i class="fas fa-file-alt me-2"></i> Review Applications
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="categories.php" class="btn btn-outline-success w-100">
-                                <i class="fas fa-tags me-2"></i> Manage Categories
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="reports.php" class="btn btn-outline-info w-100">
-                                <i class="fas fa-chart-bar me-2"></i> View Reports
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </div> -->
     </div>
 </div>
 
@@ -297,6 +267,8 @@ ob_start();
     flex: 1;
     width: 100%;
 }
+
+
 
 @media (max-width: 768px) {
     .stats-card {

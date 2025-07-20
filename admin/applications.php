@@ -99,14 +99,9 @@ ob_start();
                                     <?php while($app = mysqli_fetch_assoc($applications)): ?>
                                         <tr>
                                             <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar me-2">
-                                                        <?php echo strtoupper(substr($app['username'], 0, 1)); ?>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="mb-0"><?php echo htmlspecialchars($app['username']); ?></h6>
-                                                        <small class="text-muted">Member since <?php echo date('M Y', strtotime($app['user_created_at'])); ?></small>
-                                                    </div>
+                                                <div>
+                                                    <h6 class="mb-0"><?php echo htmlspecialchars($app['username']); ?></h6>
+                                                    <small class="text-muted">Member since <?php echo date('M Y', strtotime($app['user_created_at'])); ?></small>
                                                 </div>
                                             </td>
                                             <td><?php echo htmlspecialchars($app['email']); ?></td>

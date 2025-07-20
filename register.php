@@ -153,50 +153,232 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Ask Specialist Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #1976d2;
+            --secondary-color: #fff;
+            --accent-color: #1976d2;
+            --light-bg: #fff;
+            --gradient-primary: #1976d2;
+            --gradient-secondary: #1976d2;
+        }
+        
         body {
-            background-color: #f8f9fa;
+            background: #f8f9fa;
+            color: #222;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            padding: 0;
+            margin: 0;
         }
         .register-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(25, 118, 210, 0.08);
+            padding: 32px 28px 24px 28px;
         }
+        
+        .register-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(25, 118, 210, 0.15);
+        }
+        
+        .register-title {
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
         .register-container h2 {
-            color: #000;
-            font-weight: bold;
+            color: var(--accent-color);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
         }
-        .btn-primary {
-            background-color: #000;
-            border-color: #000;
+        
+        .register-container h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
         }
-        .btn-primary:hover {
-            background-color: #333;
-            border-color: #333;
+        
+        .form-label {
+            color: #1976d2;
+            font-weight: 500;
+            margin-bottom: 8px;
         }
+        
+        .form-control {
+            border: 2px solid #e3e6ea;
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+        }
+        
         .form-control:focus {
-            border-color: #000;
-            box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.25);
+            border-color: #1976d2;
+            box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.10);
+            background-color: #fff;
+            transform: translateY(-2px);
         }
-        a {
-            color: #000;
+        
+        .btn-primary {
+            background: #1976d2;
+            border-color: #1976d2;
+            color: #fff;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #125ea2;
+            border-color: #125ea2;
+        }
+        
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+        
+        a, .password-toggle {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        a:hover, .password-toggle:hover {
+            color: #125ea2;
+            text-decoration: underline;
+        }
+        
+        .text-muted {
+            color: #222 !important;
+            opacity: 0.7;
+        }
+        
+        .invalid-feedback {
+            color: #1976d2;
+            font-weight: 500;
+        }
+        
+        .form-control.is-invalid {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 0.25rem rgba(25, 118, 210, 0.10);
+        }
+        
+        /* Password toggle styles */
+        .password-container {
+            position: relative;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            z-index: 10;
+        }
+        
+        .password-toggle:hover {
+            color: #125ea2;
+        }
+        
+        .password-toggle:focus {
+            outline: none;
+        }
+        
+        /* Row spacing improvements */
+        .row {
+            margin-bottom: 10px;
+        }
+        
+        .col-md-6 {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        /* Add some nice animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .register-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .form-control, .btn {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .register-container {
+                margin: 20px auto;
+                padding: 30px 20px;
+            }
+            
+            .col-md-6 {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+        .text-link {
+            color: #1976d2;
             text-decoration: none;
         }
-        a:hover {
-            color: #333;
+        .text-link:hover {
+            color: #125ea2;
+            text-decoration: underline;
         }
-        .text-muted {
-            color: #666 !important;
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        body {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        html, body {
+            overflow: hidden;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="register-container">
-            <h2 class="text-center mb-4">Sign Up</h2>
+            <h2 class="register-title">Register</h2>
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -225,23 +407,49 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>">
+                        <div class="password-container">
+                            <input type="password" name="password" id="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>">
+                            <button type="button" class="password-toggle" onclick="togglePassword('password', 'toggleIcon1')">
+                                <i id="toggleIcon1" class="fa fa-eye"></i>
+                            </button>
+                        </div>
                         <span class="invalid-feedback"><?php echo $password_err; ?></span>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $confirm_password; ?>">
+                        <div class="password-container">
+                            <input type="password" name="confirm_password" id="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $confirm_password; ?>">
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', 'toggleIcon2')">
+                                <i id="toggleIcon2" class="fa fa-eye"></i>
+                            </button>
+                        </div>
                         <span class="invalid-feedback"><?php echo $confirm_password_err; ?></span>
                     </div>
                 </div>
                 <div class="mb-3">
                     <input type="submit" class="btn btn-primary w-100" value="Register as Student">
                 </div>
-                <p class="text-center">Already have an account? <a href="login.php">Login here</a>.</p>
+                <p class="text-center">Already have an account? <a href="login.php" class="text-link">Login here</a>.</p>
                 <p class="text-center text-muted small">Want to become a specialist? You can apply after registration.</p>
             </form>
         </div>
     </div>    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function togglePassword(fieldId, iconId) {
+            const passwordField = document.getElementById(fieldId);
+            const toggleIcon = document.getElementById(iconId);
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html> 

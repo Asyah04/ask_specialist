@@ -95,50 +95,55 @@ ob_start();
     </div>
 
     <!-- Statistics Cards -->
-    <div class="row mb-4">
+    <div class="row equal-height mb-4">
         <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Users</h5>
-                    <h2 class="card-text"><?php echo $user_stats['total_users']; ?></h2>
-                    <p class="card-text">
-                        Students: <?php echo $user_stats['total_students']; ?><br>
-                        Specialists: <?php echo $user_stats['total_specialists']; ?><br>
-                        Admins: <?php echo $user_stats['total_admins']; ?>
-                    </p>
+            <div class="stats-card" style="background: linear-gradient(135deg, #4DB6AC 0%, #80CBC4 100%);">
+                <div class="stats-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-info">
+                    <h5 class="card-title">Total Users</h5>
+                    <h2><?php echo $user_stats['total_users']; ?></h2>
+                    <p>Students: <?php echo $user_stats['total_students']; ?></p>
+                    <p>Specialists: <?php echo $user_stats['total_specialists']; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Questions</h5>
-                    <h2 class="card-text"><?php echo $question_stats['total_questions']; ?></h2>
-                    <p class="card-text">
-                        Open: <?php echo $question_stats['open_questions']; ?><br>
-                        Closed: <?php echo $question_stats['closed_questions']; ?>
-                    </p>
+            <div class="stats-card" style="background: linear-gradient(135deg, #66BB6A 0%, #4DB6AC 100%);">
+                <div class="stats-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="stats-info">
+                    <h5 class="card-title">Total Questions</h5>
+                    <h2><?php echo $question_stats['total_questions']; ?></h2>
+                    <p>Open: <?php echo $question_stats['open_questions']; ?></p>
+                    <p>Closed: <?php echo $question_stats['closed_questions']; ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Answers</h5>
-                    <h2 class="card-text"><?php echo $answer_stats['total_answers']; ?></h2>
+            <div class="stats-card" style="background: linear-gradient(135deg, #26A69A 0%, #4DB6AC 100%);">
+                <div class="stats-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stats-info">
+                    <h5 class="card-title">Total Answers</h5>
+                    <h2><?php echo $answer_stats['total_answers']; ?></h2>
+                    <p>Responses Given</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
+            <div class="stats-card" style="background: linear-gradient(135deg, #80CBC4 0%, #B2DFDB 100%);">
+                <div class="stats-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stats-info">
                     <h5 class="card-title">Applications</h5>
-                    <h2 class="card-text"><?php echo $application_stats['total_applications']; ?></h2>
-                    <p class="card-text">
-                        Pending: <?php echo $application_stats['pending_applications']; ?><br>
-                        Approved: <?php echo $application_stats['approved_applications']; ?><br>
-                        Rejected: <?php echo $application_stats['rejected_applications']; ?>
-                    </p>
+                    <h2><?php echo $application_stats['total_applications']; ?></h2>
+                    <p>Pending: <?php echo $application_stats['pending_applications']; ?></p>
+                    <p>Approved: <?php echo $application_stats['approved_applications']; ?></p>
                 </div>
             </div>
         </div>
@@ -227,6 +232,111 @@ ob_start();
         </div>
     </div>
 </div>
+
+<style>
+.stats-card {
+    border-radius: 15px;
+    padding: 25px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 180px; /* Fixed height for all cards */
+    display: flex;
+    align-items: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    z-index: 1;
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    margin-right: 20px;
+    opacity: 0.8;
+    z-index: 2;
+    width: 60px; /* Fixed width for icons */
+    text-align: center;
+}
+
+.stats-info {
+    flex: 1;
+    z-index: 2;
+    min-width: 0; /* Prevents text overflow */
+}
+
+.stats-card h5 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    opacity: 0.9;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stats-card h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.stats-card p {
+    font-size: 0.9rem;
+    margin: 0;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Ensure equal width columns */
+.row.equal-height {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.row.equal-height > [class*='col-'] {
+    display: flex;
+    flex-direction: column;
+}
+
+.row.equal-height > [class*='col-'] > .stats-card {
+    flex: 1;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .stats-card {
+        height: 160px; /* Slightly smaller height on mobile */
+        padding: 20px;
+    }
+    
+    .stats-icon {
+        font-size: 2rem;
+        width: 50px;
+    }
+    
+    .stats-card h2 {
+        font-size: 2rem;
+    }
+}
+</style>
 
 <?php
 $content = ob_get_clean();

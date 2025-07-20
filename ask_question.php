@@ -104,10 +104,10 @@ ob_start();
 
 <div class="container py-4">
     <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="d-flex align-items-center mb-3">
+        <div class="col-12">
+            <!-- <div class="d-flex align-items-center mb-3">
                 <h1 class="h2 mb-0">Ask a Question</h1>
-            </div>
+            </div> -->
 
         <?php if(!empty($success_message)): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -146,42 +146,29 @@ ob_start();
                         <label class="form-label fw-bold">Title</label>
                         <div class="form-text mb-2">Be specific and imagine you're asking a question to another person</div>
                         <input type="text" name="title" class="form-control <?php echo (!empty($title_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $title; ?>" placeholder="e.g. How to implement a responsive navigation bar?" required>
-                <span class="invalid-feedback"><?php echo $title_err; ?></span>
-                    </div>
-            </div>
-            
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <label class="form-label fw-bold">Category</label>
+                        <span class="invalid-feedback"><?php echo $title_err; ?></span>
+
+                        <label class="form-label fw-bold mt-3">Category</label>
                         <div class="form-text mb-2">Choose the category that best fits your question</div>
                         <select name="category_id" class="form-select <?php echo (!empty($category_err)) ? 'is-invalid' : ''; ?>" required>
-                    <option value="">Select a category</option>
-                    <?php foreach($categories as $category): ?>
-                        <option value="<?php echo $category['id']; ?>" <?php echo ($category_id == $category['id']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($category['name']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <span class="invalid-feedback"><?php echo $category_err; ?></span>
-                    </div>
-            </div>
-            
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <label class="form-label fw-bold">Body</label>
+                            <option value="">Select a category</option>
+                            <?php foreach($categories as $category): ?>
+                                <option value="<?php echo $category['id']; ?>" <?php echo ($category_id == $category['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($category['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <span class="invalid-feedback"><?php echo $category_err; ?></span>
+
+                        <label class="form-label fw-bold mt-3">Body</label>
                         <div class="form-text mb-2">Include all the information someone would need to answer your question</div>
                         <textarea name="content" class="form-control <?php echo (!empty($content_err)) ? 'is-invalid' : ''; ?>" rows="10" placeholder="Describe your problem in detail. What have you tried? What are you trying to achieve?" required></textarea>
-                <span class="invalid-feedback"><?php echo $content_err; ?></span>
-                    </div>
-            </div>
-            
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <label class="form-label fw-bold">
+                        <span class="invalid-feedback"><?php echo $content_err; ?></span>
+
+                        <label class="form-label fw-bold mt-3">
                             <i class="fas fa-paperclip me-2"></i>Attachments
                         </label>
                         <div class="form-text mb-2">Add files to help explain your question (optional)</div>
-                        
                         <div class="upload-area p-4 border rounded-3 text-center mb-2" id="dropZone">
                             <input type="file" name="image" id="fileInput" class="d-none" accept="image/*">
                             <div class="upload-icon mb-2">
@@ -192,7 +179,6 @@ ob_start();
                                 Drag & Drop your files here
                             </h6>
                             <p class="text-muted small mb-2">or</p>
-                            
                             <div class="supported-formats mt-3">
                                 <div class="row g-2 justify-content-center">
                                     <div class="col-auto">
@@ -237,7 +223,6 @@ ob_start();
                                 </p>
                             </div>
                         </div>
-                        
                         <div id="codeEditorArea" class="d-none">
                             <div class="card">
                                 <div class="card-header py-2 d-flex justify-content-between align-items-center">
@@ -280,7 +265,6 @@ ob_start();
                                 </div>
                             </div>
                         </div>
-                        
                         <div id="previewArea" class="d-none">
                             <div class="selected-file p-2 border rounded-3 d-flex align-items-center">
                                 <div class="file-icon me-2">
@@ -315,20 +299,18 @@ ob_start();
                                 </div>
                             </div>
                         </div>
-                        
-                <span class="invalid-feedback"><?php echo $image_err; ?></span>
+                        <span class="invalid-feedback"><?php echo $image_err; ?></span>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="dashboard.php" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Post Question
+                            </button>
+                        </div>
                     </div>
-            </div>
-            
-                <div class="d-flex justify-content-end gap-2">
-                    <a href="dashboard.php" class="btn btn-outline-secondary">
-                        Cancel
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        Post Question
-                    </button>
-            </div>
-        </form>
+                </div>
+            </form>
         </div>
     </div>
 </div>
