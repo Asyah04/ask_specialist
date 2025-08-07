@@ -1,11 +1,11 @@
 -- Create database
-CREATE DATABASE IF NOT EXISTS ask_specialist;
-USE ask_specialist;
+CREATE DATABASE IF NOT EXISTS ask_specialistv2;
+USE ask_specialistv2;
 
 -- Categories table
-CREATE TABLE IF NOT EXISTS categories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) UNIQUE NOT NULL,
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(255) UNIQUE NOT NULL,
     address VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'student', 'specialist') NOT NULL,
+    role ENUM('admin', 'asker', 'specialist') NOT NULL,
     deleted_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -78,18 +78,12 @@ CREATE TABLE IF NOT EXISTS specialist_applications (
 );
 
 -- Insert default categories
-INSERT INTO categories (name, description) VALUES 
-('Mathematics', 'Questions related to mathematics, algebra, calculus, etc.'),
-('Physics', 'Questions about physics, mechanics, thermodynamics, etc.'),
-('Computer Science', 'Programming, algorithms, data structures, etc.'),
-('Chemistry', 'Questions about chemical reactions, elements, compounds, etc.'),
-('Biology', 'Questions about living organisms, cells, genetics, etc.'),
-('Engineering', 'Questions about various engineering disciplines'),
-('Languages', 'Questions about different languages and linguistics'),
-('History', 'Questions about historical events and periods'),
-('Geography', 'Questions about countries, regions, and physical features'),
-('General Knowledge', 'General questions and miscellaneous topics');
-
+INSERT INTO categories (name, description) VALUES
+('Health & Wellness', 'Advice and information related to physical and mental health, fitness, nutrition, and wellbeing.'),
+('Education & Career Guidance', 'Support with learning, school choices, job applications, scholarships, and career planning.'),
+('Technology & Digital Skills', 'Help with using digital tools, coding, gadgets, internet safety, and online platforms.'),
+('Legal & Government Services', 'Guidance on laws, rights, legal procedures, and accessing public/government services.'),
+('Business & Financial Literacy', 'Assistance with entrepreneurship, managing money, savings, loans, and business planning.');
 -- Insert default admin user (password: admin123)
 -- Using proper bcrypt hash for 'admin123'
 INSERT INTO users (username, password, email, phone, address, role) VALUES 

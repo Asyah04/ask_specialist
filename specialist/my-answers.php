@@ -11,9 +11,7 @@ require_once "../config/database.php";
 
 // Get questions that the specialist has answered
 $sql = "SELECT q.*, u.username, a.created_at as answer_date, a.content as answer_content, a.id as answer_id,
-        (SELECT COUNT(*) FROM answers WHERE question_id = q.id) as total_answers,
-        (SELECT COUNT(*) FROM answer_votes WHERE answer_id = a.id AND vote_type = 'like') as likes,
-        (SELECT COUNT(*) FROM answer_votes WHERE answer_id = a.id AND vote_type = 'dislike') as dislikes
+        (SELECT COUNT(*) FROM answers WHERE question_id = q.id) as total_answers
         FROM questions q 
         JOIN answers a ON q.id = a.question_id 
         JOIN users u ON q.user_id = u.id 
@@ -66,26 +64,19 @@ ob_start();
                                         </div>
                                     </div>
                                     <div class="mt-3">
-                                        <h6 class="mb-2">Your Answer:</h6>
-                                        <div class="bg-light p-3 rounded">
-                                            <p class="mb-1"><?php echo substr(htmlspecialchars($question['answer_content']), 0, 200) . '...'; ?></p>
+                                        <h6 class="mb-2" style="color: var(--text-color, #333);">Your Answer:</h6>
+                                        <div class="p-3 rounded" style="background: var(--card-background, #f8f9fa); border: 1px solid var(--border-color, #dee2e6);">
+                                            <p class="mb-1" style="color: var(--text-color, #333);"><?php echo substr(htmlspecialchars($question['answer_content']), 0, 200) . '...'; ?></p>
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <small class="text-muted">
+                                                <small style="color: var(--text-muted, #6c757d);">
                                                     Answered on <?php echo date('M d, Y', strtotime($question['answer_date'])); ?>
                                                 </small>
-                                                <div class="vote-stats">
-                                                    <span class="text-success me-2">
-                                                        <i class="fas fa-thumbs-up"></i> <?php echo $question['likes']; ?>
-                                                    </span>
-                                                    <span class="text-danger">
-                                                        <i class="fas fa-thumbs-down"></i> <?php echo $question['dislikes']; ?>
-                                                    </span>
-                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
                                     <div class="mt-2">
-                                        <a href="../question.php?id=<?php echo $question['id']; ?>" class="btn btn-sm btn-primary">
+                                        <a href="../view_question.php?id=<?php echo $question['id']; ?>" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye me-1"></i> View Full Question
                                         </a>
                                     </div>

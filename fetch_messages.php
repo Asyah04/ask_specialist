@@ -23,7 +23,7 @@ $update_stmt->execute();
 
 // Get messages
 $stmt = $conn->prepare("
-    SELECT m.*, u.username as sender_name 
+    SELECT m.id, m.message, m.timestamp, m.sender_id, u.username as sender_name 
     FROM messages m 
     JOIN users u ON m.sender_id = u.id 
     WHERE (m.sender_id = ? AND m.receiver_id = ?) 
@@ -37,10 +37,11 @@ $result = $stmt->get_result();
 $messages = [];
 while($row = $result->fetch_assoc()) {
     $messages[] = [
+        'id' => $row['id'],
         'message' => htmlspecialchars($row['message']),
         'timestamp' => date('H:i', strtotime($row['timestamp'])),
         'is_sent' => $row['sender_id'] == $sender_id,
-        'sender_name' => $row['sender_name']
+        'sender_name' => htmlspecialchars($row['sender_name'])
     ];
 }
 

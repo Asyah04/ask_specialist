@@ -41,14 +41,16 @@ ob_start();
 
 <style>
     .chat-container {
-        max-width: 800px;
-        margin: 20px auto;
-        background: #fff;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        background: var(--card-background, #fff);
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         display: flex;
         flex-direction: column;
         height: calc(100vh - 200px);
+        border: 1px solid var(--border-color, #eee);
     }
 
     .chat-header {
@@ -57,15 +59,16 @@ ob_start();
         display: flex;
         align-items: center;
         gap: 10px;
-        background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+        background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
         color: white;
         border-radius: 10px 10px 0 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .profile-circle {
         width: 40px;
         height: 40px;
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.25);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -73,6 +76,7 @@ ob_start();
         color: white;
         font-size: 1.2rem;
         font-weight: bold;
+        border: 2px solid rgba(255, 255, 255, 0.3);
     }
 
     .chat-info {
@@ -87,11 +91,13 @@ ob_start();
 
     .online-status {
         font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
     }
 
     .online-status.online {
         color: #fff;
+        font-weight: 600;
     }
 
     .online-status.online::before {
@@ -111,7 +117,7 @@ ob_start();
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background: #f8f9fa;
+        background: var(--background-color, #f8f9fa);
     }
 
     .message {
@@ -129,11 +135,12 @@ ob_start();
     }
 
     .message.received {
-        background: white;
-        color: #333;
+        background: var(--card-background, white);
+        color: var(--text-color, #333);
         align-self: flex-start;
         border-bottom-left-radius: 5px;
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        border: 1px solid var(--border-color, #eee);
     }
 
     .message .sender {
@@ -151,43 +158,61 @@ ob_start();
 
     .input-container {
         padding: 15px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid var(--border-color, #eee);
         display: flex;
         gap: 10px;
-        background: white;
+        background: var(--card-background, white);
         border-radius: 0 0 10px 10px;
     }
 
     .message-input {
         flex: 1;
         padding: 10px 15px;
-        border: 1px solid #ddd;
+        border: 1px solid var(--border-color, #ddd);
         border-radius: 20px;
         outline: none;
         transition: border-color 0.3s;
+        background: var(--card-background, white);
+        color: var(--text-color, #333);
     }
 
     .message-input:focus {
         border-color: var(--primary-color);
     }
 
+    .message-input::placeholder {
+        color: var(--text-muted, #6c757d);
+    }
+
     .send-button {
         padding: 10px 20px;
-        background: var(--primary-color);
-        color: white;
+        background: var(--primary-color) !important;
+        color: white !important;
         border: none;
         border-radius: 20px;
         cursor: pointer;
         transition: all 0.3s;
+        font-weight: 500;
     }
 
     .send-button:hover {
-        background: var(--accent-color);
+        background: var(--primary-color) !important;
+        color: white !important;
         transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
     }
 
     .send-button:active {
+        background: var(--primary-color) !important;
+        color: white !important;
         transform: translateY(0);
+    }
+
+    .send-button:focus {
+        background: var(--primary-color) !important;
+        color: white !important;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 </style>
 
@@ -214,9 +239,41 @@ ob_start();
 
 <script>
 let lastMessageTime = '';
+let isTyping = false;
+let typingTimeout;
+let lastActivity = Date.now();
+
+// Update user's online status
+function updateUserOnlineStatus() {
+    // Determine the correct path based on current directory
+    const currentPath = window.location.pathname;
+    let statusPath = 'update_online_status.php';
+    
+    // If we're in admin or specialist directory, go up one level
+    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
+        statusPath = '../update_online_status.php';
+    }
+    
+    fetch(statusPath, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=update'
+    });
+}
 
 function updateOnlineStatus() {
-    fetch('check_online_status.php?user_id=<?= $receiver_id ?>')
+    // Determine the correct path based on current directory
+    const currentPath = window.location.pathname;
+    let checkPath = 'check_online_status.php?user_id=<?= $receiver_id ?>';
+    
+    // If we're in admin or specialist directory, go up one level
+    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
+        checkPath = '../check_online_status.php?user_id=<?= $receiver_id ?>';
+    }
+    
+    fetch(checkPath)
         .then(response => response.json())
         .then(data => {
             const statusElement = document.getElementById('onlineStatus');
@@ -227,11 +284,21 @@ function updateOnlineStatus() {
                 statusElement.textContent = 'Last seen ' + data.last_seen;
                 statusElement.classList.remove('online');
             }
-        });
+        })
+        .catch(error => console.log('Status check failed:', error));
 }
 
 function loadMessages() {
-    fetch('fetch_messages.php', {
+    // Determine the correct path based on current directory
+    const currentPath = window.location.pathname;
+    let messagesPath = 'fetch_messages.php';
+    
+    // If we're in admin or specialist directory, go up one level
+    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
+        messagesPath = '../fetch_messages.php';
+    }
+    
+    fetch(messagesPath, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -241,11 +308,15 @@ function loadMessages() {
     .then(response => response.json())
     .then(messages => {
         const container = document.getElementById('messagesContainer');
+        const wasAtBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 1;
+        
+        // Clear and rebuild messages
         container.innerHTML = '';
         
         messages.forEach(msg => {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${msg.is_sent ? 'sent' : 'received'}`;
+            messageDiv.setAttribute('data-message-id', msg.id);
             
             const senderDiv = document.createElement('div');
             senderDiv.className = 'sender';
@@ -265,11 +336,17 @@ function loadMessages() {
             container.appendChild(messageDiv);
         });
         
-        container.scrollTop = container.scrollHeight;
+        // Auto-scroll if user was at bottom or if there are new messages
+        if(wasAtBottom || messages.length !== container.children.length) {
+            container.scrollTop = container.scrollHeight;
+        }
         
         if(messages.length > 0) {
             lastMessageTime = messages[messages.length - 1].timestamp;
         }
+    })
+    .catch(error => {
+        console.log('Failed to load messages:', error);
     });
 }
 
@@ -278,11 +355,32 @@ function sendMessage() {
     const message = input.value.trim();
     
     if(message) {
+        // Clear input immediately for better UX
+        input.value = '';
+        
         // Disable input and button while sending
         input.disabled = true;
         document.getElementById('sendButton').disabled = true;
         
-        fetch('send_message.php', {
+        // Add message to UI immediately (optimistic update)
+        addMessageToUI({
+            message: message,
+            sender_name: 'You',
+            timestamp: new Date().toLocaleTimeString(),
+            is_sent: true,
+            id: 'temp-' + Date.now()
+        });
+        
+        // Determine the correct path based on current directory
+        const currentPath = window.location.pathname;
+        let sendPath = 'send_message.php';
+        
+        // If we're in admin or specialist directory, go up one level
+        if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
+            sendPath = '../send_message.php';
+        }
+        
+        fetch(sendPath, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -291,17 +389,21 @@ function sendMessage() {
         })
         .then(response => response.json())
         .then(data => {
-            // Clear input and reload messages regardless of success
-            input.value = '';
-            loadMessages();
-            
-            if(!data.success) {
+            if(data.success) {
+                // Immediately load new messages to get the real message ID
+                setTimeout(loadMessages, 100);
+            } else {
+                // Remove the optimistic message and show error
+                removeTemporaryMessage();
                 alert(data.error || 'Failed to send message. Please try again.');
+                input.value = message; // Restore message
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            removeTemporaryMessage();
             alert('Failed to send message. Please try again.');
+            input.value = message; // Restore message
         })
         .finally(() => {
             // Re-enable input and button
@@ -312,13 +414,54 @@ function sendMessage() {
     }
 }
 
-// Update online status every 30 seconds
-setInterval(updateOnlineStatus, 30000);
+function addMessageToUI(msg) {
+    const container = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${msg.is_sent ? 'sent' : 'received'}`;
+    messageDiv.setAttribute('data-message-id', msg.id);
+    
+    const senderDiv = document.createElement('div');
+    senderDiv.className = 'sender';
+    senderDiv.textContent = msg.sender_name;
+    
+    const messageText = document.createElement('div');
+    messageText.textContent = msg.message;
+    
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'time';
+    timeDiv.textContent = msg.timestamp;
+    
+    messageDiv.appendChild(senderDiv);
+    messageDiv.appendChild(messageText);
+    messageDiv.appendChild(timeDiv);
+    
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+function removeTemporaryMessage() {
+    const tempMessages = document.querySelectorAll('[data-message-id^="temp-"]');
+    tempMessages.forEach(msg => msg.remove());
+}
+
+// Update user's own online status every 30 seconds
+setInterval(updateUserOnlineStatus, 30000);
+updateUserOnlineStatus();
+
+// Update recipient's online status every 15 seconds
+setInterval(updateOnlineStatus, 15000);
 updateOnlineStatus();
 
-// Load messages every 5 seconds
-setInterval(loadMessages, 5000);
+// Load messages every 1 second for real-time chat
+setInterval(loadMessages, 1000);
 loadMessages();
+
+// Track user activity for auto-updating online status
+setInterval(() => {
+    if(Date.now() - lastActivity < 60000) { // Active in last minute
+        updateUserOnlineStatus();
+    }
+}, 10000);
 
 // Send message on button click
 document.getElementById('sendButton').addEventListener('click', sendMessage);
@@ -328,6 +471,38 @@ document.getElementById('messageInput').addEventListener('keypress', function(e)
     if(e.key === 'Enter') {
         sendMessage();
     }
+});
+
+// Track typing activity
+document.getElementById('messageInput').addEventListener('input', function() {
+    lastActivity = Date.now();
+});
+
+// Track any user activity
+document.addEventListener('mousemove', () => lastActivity = Date.now());
+document.addEventListener('keypress', () => lastActivity = Date.now());
+document.addEventListener('click', () => lastActivity = Date.now());
+
+// Update online status when page becomes visible
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        updateUserOnlineStatus();
+        loadMessages();
+    }
+});
+
+// Update status when user leaves/closes page
+window.addEventListener('beforeunload', function() {
+    // Determine the correct path based on current directory
+    const currentPath = window.location.pathname;
+    let statusPath = 'update_online_status.php';
+    
+    // If we're in admin or specialist directory, go up one level
+    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
+        statusPath = '../update_online_status.php';
+    }
+    
+    navigator.sendBeacon(statusPath, 'action=offline');
 });
 </script>
 

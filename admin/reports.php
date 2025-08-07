@@ -73,107 +73,142 @@ ob_start();
 ?>
 
 <div class="container">
-    <!-- Date Range Filter -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label for="start_date" class="form-label">Start Date</label>
-                    <input type="date" class="form-control" id="start_date" name="start_date" 
-                           value="<?php echo $start_date; ?>" max="<?php echo $end_date; ?>">
+    <!-- Date Range Filter - Compact -->
+    <div class="card mb-3">
+        <div class="card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <form method="GET" class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label for="start_date" class="form-label small fw-bold">
+                                <i class="fas fa-calendar-alt me-1"></i>Start Date
+                            </label>
+                            <input type="date" class="form-control form-control-sm" id="start_date" name="start_date" 
+                                   value="<?php echo $start_date; ?>" max="<?php echo $end_date; ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="end_date" class="form-label small fw-bold">
+                                <i class="fas fa-calendar-alt me-1"></i>End Date
+                            </label>
+                            <input type="date" class="form-control form-control-sm" id="end_date" name="end_date" 
+                                   value="<?php echo $end_date; ?>" min="<?php echo $start_date; ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-filter me-1"></i>Apply Filter
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-md-4">
-                    <label for="end_date" class="form-label">End Date</label>
-                    <input type="date" class="form-control" id="end_date" name="end_date" 
-                           value="<?php echo $end_date; ?>" min="<?php echo $start_date; ?>">
+                <div class="col-md-4 text-end">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Filter reports by date range
+                    </small>
                 </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary">Apply Filter</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
+    <!-- Statistics Cards - Compact Admin Style -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Users</h5>
-                    <h2 class="card-text"><?php echo $user_stats['total_users']; ?></h2>
-                    <p class="card-text">
-                        Students: <?php echo $user_stats['total_students']; ?><br>
-                        Specialists: <?php echo $user_stats['total_specialists']; ?><br>
-                        Admins: <?php echo $user_stats['total_admins']; ?>
-                    </p>
+            <div class="stats-card fade-in" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); animation-delay: 0.1s;">
+                <div class="stats-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Total Users</div>
+                    <div class="stats-number"><?php echo $user_stats['total_users']; ?></div>
+                    <div class="stats-label">S: <?php echo $user_stats['total_students']; ?> | Sp: <?php echo $user_stats['total_specialists']; ?></div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Questions</h5>
-                    <h2 class="card-text"><?php echo $question_stats['total_questions']; ?></h2>
-                    <p class="card-text">
-                        Open: <?php echo $question_stats['open_questions']; ?><br>
-                        Closed: <?php echo $question_stats['closed_questions']; ?>
-                    </p>
+            <div class="stats-card fade-in" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); animation-delay: 0.2s;">
+                <div class="stats-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Total Questions</div>
+                    <div class="stats-number"><?php echo $question_stats['total_questions']; ?></div>
+                    <div class="stats-label">Open: <?php echo $question_stats['open_questions']; ?> | Closed: <?php echo $question_stats['closed_questions']; ?></div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Answers</h5>
-                    <h2 class="card-text"><?php echo $answer_stats['total_answers']; ?></h2>
+            <div class="stats-card fade-in" style="background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%); animation-delay: 0.3s;">
+                <div class="stats-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Total Answers</div>
+                    <div class="stats-number"><?php echo $answer_stats['total_answers']; ?></div>
+                    <div class="stats-label">Responses Given</div>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Applications</h5>
-                    <h2 class="card-text"><?php echo $application_stats['total_applications']; ?></h2>
-                    <p class="card-text">
-                        Pending: <?php echo $application_stats['pending_applications']; ?><br>
-                        Approved: <?php echo $application_stats['approved_applications']; ?><br>
-                        Rejected: <?php echo $application_stats['rejected_applications']; ?>
-                    </p>
+            <div class="stats-card fade-in" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); animation-delay: 0.4s;">
+                <div class="stats-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stats-info">
+                    <div class="stats-label">Applications</div>
+                    <div class="stats-number"><?php echo $application_stats['total_applications']; ?></div>
+                    <div class="stats-label">P: <?php echo $application_stats['pending_applications']; ?> | A: <?php echo $application_stats['approved_applications']; ?></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <!-- Questions by Category -->
-        <div class="col-md-6 mb-4">
+        <!-- Questions by Category - Full Width -->
+        <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Questions by Category</h5>
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Questions by Category
+                    </h5>
                 </div>
                 <div class="card-body">
                     <?php if(mysqli_num_rows($category_stats) > 0): ?>
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table table-hover reports-category-table">
                                 <thead>
                                     <tr>
                                         <th>Category</th>
-                                        <th>Questions</th>
-                                        <th>Percentage</th>
+                                        <th class="text-center">Questions</th>
+                                        <th class="text-center">Percentage</th>
+                                        <th>Progress</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php while($category = mysqli_fetch_assoc($category_stats)): ?>
                                         <tr>
                                             <td><?php echo htmlspecialchars($category['name']); ?></td>
-                                            <td><?php echo $category['question_count']; ?></td>
-                                            <td>
+                                            <td class="text-center">
+                                                <span class="badge bg-primary"><?php echo $category['question_count']; ?></span>
+                                            </td>
+                                            <td class="text-center">
                                                 <?php 
                                                     $percentage = $question_stats['total_questions'] > 0 
                                                         ? round(($category['question_count'] / $question_stats['total_questions']) * 100, 1) 
                                                         : 0;
-                                                    echo $percentage . '%';
+                                                    echo '<strong>' . $percentage . '%</strong>';
                                                 ?>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-primary" 
+                                                         role="progressbar" 
+                                                         style="width: <?php echo $percentage; ?>%"
+                                                         aria-valuenow="<?php echo $percentage; ?>" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        <?php echo $percentage; ?>%
+                                                    </div>
+                                                </div>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -181,52 +216,87 @@ ob_start();
                             </table>
                         </div>
                     <?php else: ?>
-                        <p class="text-muted mb-0">No categories found</p>
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                            <h6>No Categories Found</h6>
+                            <p class="text-muted mb-0">Add some categories to see statistics</p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="col-md-6 mb-4">
+        <!-- Recent Activity - Full Width with Horizontal Scroll -->
+        <div class="col-12 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Recent Activity</h5>
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Recent Activity
+                    </h5>
                 </div>
                 <div class="card-body">
                     <?php if(mysqli_num_rows($recent_activity) > 0): ?>
-                        <div class="list-group">
-                            <?php while($activity = mysqli_fetch_assoc($recent_activity)): ?>
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-1">
+                        <div class="table-responsive">
+                            <table class="table table-hover reports-activity-table">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Content</th>
+                                        <th>User</th>
+                                        <th>Date & Time</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while($activity = mysqli_fetch_assoc($recent_activity)): ?>
+                                        <tr>
+                                            <td>
                                                 <?php if($activity['type'] === 'question'): ?>
-                                                    <i class="fas fa-question-circle text-primary me-2"></i>
-                                                    New Question
+                                                    <span class="badge bg-primary">
+                                                        <i class="fas fa-question-circle me-1"></i>Question
+                                                    </span>
                                                 <?php else: ?>
-                                                    <i class="fas fa-comment text-success me-2"></i>
-                                                    New Answer
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-comment me-1"></i>Answer
+                                                    </span>
                                                 <?php endif; ?>
-                                            </h6>
-                                            <p class="mb-1"><?php echo htmlspecialchars($activity['content']); ?></p>
-                                            <small class="text-muted">
-                                                By <?php echo htmlspecialchars($activity['username']); ?> on 
-                                                <?php echo date('M d, Y H:i', strtotime($activity['created_at'])); ?>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endwhile; ?>
+                                            </td>
+                                            <td class="content-cell" title="<?php echo htmlspecialchars($activity['content']); ?>">
+                                                <?php echo htmlspecialchars(substr($activity['content'], 0, 80) . (strlen($activity['content']) > 80 ? '...' : '')); ?>
+                                            </td>
+                                            <td>
+                                                <strong><?php echo htmlspecialchars($activity['username']); ?></strong>
+                                            </td>
+                                            <td class="text-nowrap">
+                                                <?php echo date('M d, Y', strtotime($activity['created_at'])); ?><br>
+                                                <small class="text-muted"><?php echo date('H:i', strtotime($activity['created_at'])); ?></small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">General</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">Active</span>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
                         </div>
                     <?php else: ?>
-                        <p class="text-muted mb-0">No recent activity</p>
+                        <div class="text-center py-4">
+                            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                            <h6>No Recent Activity</h6>
+                            <p class="text-muted mb-0">Activity will appear here as users interact with the platform</p>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modern compact admin-style stats cards now loaded from layout.php -->
 
 <?php
 $content = ob_get_clean();

@@ -93,11 +93,8 @@ ob_start();
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="mb-0">All Users</h5>
-                    <a href="add_user.php" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add New User
-                    </a>
                 </div>
                 <div class="card-body">
                     <?php if(isset($_SESSION['success'])): ?>
@@ -126,17 +123,21 @@ ob_start();
                                         <th>Username</th>
                                         <th>Email</th>
                                         <th>Role</th>
-                                        <th>Questions</th>
-                                        <th>Answers</th>
+                                        <th class="text-center">Q</th>
+                                        <th class="text-center">A</th>
                                         <th>Joined</th>
-                                        <th>Actions</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach($users as $user): ?>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                            <td title="<?php echo htmlspecialchars($user['username']); ?>">
+                                                <?php echo htmlspecialchars($user['username']); ?>
+                                            </td>
+                                            <td class="email-cell" title="<?php echo htmlspecialchars($user['email']); ?>">
+                                                <?php echo htmlspecialchars($user['email']); ?>
+                                            </td>
                                             <td>
                                                 <span class="badge bg-<?php 
                                                     echo $user['role'] === 'admin' ? 'danger' : 
@@ -145,15 +146,21 @@ ob_start();
                                                     <?php echo ucfirst($user['role']); ?>
                                                 </span>
                                             </td>
-                                            <td><?php echo $user['question_count']; ?></td>
-                                            <td><?php echo $user['answer_count']; ?></td>
-                                            <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
-                                            <td>
+                                            <td class="text-center"><?php echo $user['question_count']; ?></td>
+                                            <td class="text-center"><?php echo $user['answer_count']; ?></td>
+                                            <td title="<?php echo date('M d, Y', strtotime($user['created_at'])); ?>">
+                                                <?php echo date('M j', strtotime($user['created_at'])); ?>
+                                            </td>
+                                            <td class="text-center">
                                                 <div class="btn-group">
-                                                    <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-sm btn-primary">
+                                                    <a href="edit_user.php?id=<?php echo $user['id']; ?>" 
+                                                       class="btn btn-sm btn-primary" 
+                                                       title="Edit User">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
-                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-danger" 
+                                                            title="Delete User"
                                                             onclick="confirmDelete(<?php echo $user['id']; ?>, '<?php echo htmlspecialchars($user['username']); ?>')">
                                                         <i class="fas fa-trash"></i>
                                                     </button>

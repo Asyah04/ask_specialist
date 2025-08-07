@@ -7,8 +7,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     exit;
 }
 
-// Check if user is a student
-if($_SESSION["role"] !== "student"){
+// Check if user is a asker
+if($_SESSION["role"] !== "asker"){
     header("location: dashboard.php");
     exit;
 }

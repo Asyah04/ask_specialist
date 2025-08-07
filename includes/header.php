@@ -41,7 +41,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="profile.php">Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="../include/logout.php">Logout</a></li>
+                            <li><a class="dropdown-item" href="../include/logout.php" style="box-shadow: 2px 4px 8px white;">Logout</a></li>
                         </ul>
                     </li>
                 <?php else: ?>

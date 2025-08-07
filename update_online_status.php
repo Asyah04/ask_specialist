@@ -1,12 +1,23 @@
-<?php
-session_start();
+<?phpsession_start();
 require_once 'config/database.php';
 
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     exit('Not logged in');
 }
 
-// Create online_status table if it doesn't exist
+if(!isset($_SESSION['id'])){
+    exit('User ID missing from session');
+}
+
+$user_id = $_SESSION['id'];
+
+// Check user exists
+$result = $conn->query("SELECT id FROM users WHERE id = $user_id");
+if($result->num_rows === 0){
+    exit("User with ID $user_id does not exist.");
+}
+
+// Create table if not exists
 $conn->query("
     CREATE TABLE IF NOT EXISTS online_status (
         user_id INT PRIMARY KEY,
@@ -16,10 +27,9 @@ $conn->query("
     )
 ");
 
-// Wait a moment to ensure table is created
 sleep(1);
 
-// Check if index exists
+// Create index if not exists
 $index_exists = $conn->query("
     SELECT COUNT(1) IndexIsThere 
     FROM INFORMATION_SCHEMA.STATISTICS 
@@ -28,19 +38,15 @@ $index_exists = $conn->query("
     AND index_name='idx_last_seen'
 ")->fetch_row()[0];
 
-// Create index if it doesn't exist
 if (!$index_exists) {
     try {
         $conn->query("CREATE INDEX idx_last_seen ON online_status(last_seen)");
     } catch (Exception $e) {
-        // If index creation fails, continue without it
         error_log("Failed to create index: " . $e->getMessage());
     }
 }
 
-$user_id = $_SESSION['id'];
-
-// Update or insert online status
+// Insert or update online status
 $stmt = $conn->prepare("
     INSERT INTO online_status (user_id, is_online, last_seen) 
     VALUES (?, 1, CURRENT_TIMESTAMP)
@@ -51,11 +57,12 @@ $stmt = $conn->prepare("
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 
-// Set users as offline if they haven't been seen in the last 5 minutes
+// Mark users offline if last seen more than 5 minutes ago
 $stmt = $conn->prepare("
     UPDATE online_status 
     SET is_online = 0 
     WHERE last_seen < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
 ");
 $stmt->execute();
+
 ?> 

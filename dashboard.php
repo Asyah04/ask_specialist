@@ -20,21 +20,60 @@ while($row = mysqli_fetch_assoc($categories_result)) {
     $categories[] = $row;
 }
 
+// Get online specialists (only those currently online)
+$specialists_sql = "SELECT u.id, u.username, u.email, c.name as category_name,
+        os.is_online, os.last_seen,
+        (SELECT COUNT(*) FROM answers WHERE user_id = u.id) as total_answers
+        FROM users u 
+        JOIN specialist_applications sa ON u.id = sa.user_id 
+        JOIN categories c ON sa.category_id = c.id 
+        JOIN online_status os ON u.id = os.user_id
+        WHERE sa.status = 'approved' AND os.is_online = 1
+        ORDER BY os.last_seen DESC";
+$specialists_result = mysqli_query($conn, $specialists_sql);
+$specialists = mysqli_fetch_all($specialists_result, MYSQLI_ASSOC);
+
 // Get questions with answers
 $sql = "SELECT q.*, c.name as category_name, u.username as asker_name,
         (SELECT COUNT(*) FROM answers WHERE question_id = q.id) as answer_count
         FROM questions q 
         JOIN categories c ON q.category_id = c.id 
         JOIN users u ON q.user_id = u.id 
-        ORDER BY q.created_at DESC";
+        WHERE q.user_id = ?";
 
-if($stmt = mysqli_prepare($conn, $sql)){
-    if(mysqli_stmt_execute($stmt)){
-        $result = mysqli_stmt_get_result($stmt);
-    }
+$params = [$_SESSION["id"]];
+$types = "i";
+
+// Add search filter
+if (!empty($search)) {
+    $sql .= " AND (q.title LIKE ? OR q.content LIKE ?)";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+    $types .= "ss";
 }
 
-$page_title = "Student Dashboard";
+// Add category filter
+if ($category_id > 0) {
+    $sql .= " AND q.category_id = ?";
+    $params[] = $category_id;
+    $types .= "i";
+}
+
+$sql .= " ORDER BY q.created_at DESC";
+
+// Prepare and bind
+if($stmt = mysqli_prepare($conn, $sql)) {
+    mysqli_stmt_bind_param($stmt, $types, ...$params); 
+    if(mysqli_stmt_execute($stmt)){
+        $result = mysqli_stmt_get_result($stmt);
+    } else {
+        echo "Query execution failed.";
+    }
+} else {
+    echo "Failed to prepare statement.";
+}
+
+$page_title = "Asker Dashboard";
 ob_start();
 ?>
 
@@ -58,10 +97,38 @@ ob_start();
                 <?php endif; ?>
             </form>
         </div>
-        <div class="col-md-4 text-end">
-            <a href="ask_question.php" class="btn btn-success">
-                <i class="fas fa-plus"></i> Ask New Question
-            </a>
+        <div class="col-md-4">
+            <div class="online-specialists-compact">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="specialistsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-tie me-2"></i>Online Specialists (<?php echo count($specialists); ?>)
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end specialists-dropdown" aria-labelledby="specialistsDropdown">
+                        <?php if(!empty($specialists)): ?>
+                            <?php foreach($specialists as $specialist): ?>
+                                <li>
+                                    <a class="dropdown-item specialist-item" href="chat.php?receiver_id=<?php echo $specialist['id']; ?>">
+                                        <div class="d-flex align-items-center">
+                                            <div class="specialist-avatar-small">
+                                                <?php echo strtoupper(substr($specialist['username'], 0, 1)); ?>
+                                            </div>
+                                            <div class="specialist-info-compact flex-grow-1">
+                                                <div class="specialist-name"><?php echo htmlspecialchars($specialist['username']); ?></div>
+                                                <small class="text-muted"><?php echo htmlspecialchars($specialist['category_name']); ?></small>
+                                            </div>
+                                            <div class="online-indicator">
+                                                <i class="fas fa-circle text-success"></i>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li><span class="dropdown-item-text text-muted">No specialists online</span></li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -95,49 +162,32 @@ ob_start();
                                         <h6 class="me-2">Answers (<?php echo $row['answer_count']; ?>)</h6>
                                         <i class="fas fa-chevron-down"></i>
                                     </div>
-                                    <div class="collapse" id="answers-<?php echo $row['id']; ?>">
+                                    <div class="collapse" id="answers-<?php echo $row['id']; ?>" style="padding-top: 0.75rem;">
                                         <?php 
                                         // Get answers for this question
-                                        $answers_sql = "SELECT a.*, u.username as answerer_name, u.role as answerer_role,
-                                                        (SELECT COUNT(*) FROM answer_votes WHERE answer_id = a.id AND vote_type = 'like') as likes,
-                                                        (SELECT COUNT(*) FROM answer_votes WHERE answer_id = a.id AND vote_type = 'dislike') as dislikes,
-                                                        (SELECT vote_type FROM answer_votes WHERE answer_id = a.id AND user_id = ?) as user_vote
+                                        $answers_sql = "SELECT a.*, u.username as answerer_name, u.role as answerer_role
                                                         FROM answers a 
                                                         JOIN users u ON a.user_id = u.id 
                                                         WHERE a.question_id = ? 
                                                         ORDER BY a.created_at ASC";
                                         if($answers_stmt = mysqli_prepare($conn, $answers_sql)){
-                                            mysqli_stmt_bind_param($answers_stmt, "ii", $_SESSION["id"], $row['id']);
+                                            mysqli_stmt_bind_param($answers_stmt, "i", $row['id']);
                                             if(mysqli_stmt_execute($answers_stmt)){
                                                 $answers_result = mysqli_stmt_get_result($answers_stmt);
                                                 while($answer = mysqli_fetch_assoc($answers_result)):
                                         ?>
-                                            <div class="answer-item bg-light rounded">
-                                                <div class="d-flex justify-content-between">
-                                                    <small class="text-muted">
+                                            <div class="answer-item">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <small style="color: #6c757d !important; font-size: 0.875rem;">
                                                         Answered by 
-                                                        <strong><?php echo htmlspecialchars($answer['answerer_name']); ?></strong>
+                                                        <strong style="color: #2563eb !important;"><?php echo htmlspecialchars($answer['answerer_name']); ?></strong>
                                                         <?php if($answer['answerer_role'] === 'specialist'): ?>
-                                                            <span class="badge bg-success ms-1">Specialist</span>
+                                                            <span class="badge bg-success ms-1" style="font-size: 0.75rem;">Specialist</span>
                                                         <?php endif; ?>
                                                         on <?php echo date('M d, Y', strtotime($answer['created_at'])); ?>
                                                     </small>
                                                 </div>
-                                                <p><?php echo htmlspecialchars($answer['content']); ?></p>
-                                                <div class="vote-buttons">
-                                                    <button class="btn btn-sm btn-outline-primary vote-btn <?php echo $answer['user_vote'] === 'like' ? 'active' : ''; ?>" 
-                                                            data-answer-id="<?php echo $answer['id']; ?>" 
-                                                            data-vote-type="like">
-                                                        <i class="fas fa-thumbs-up"></i>
-                                                        <span class="likes-count"><?php echo $answer['likes']; ?></span>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-outline-danger vote-btn <?php echo $answer['user_vote'] === 'dislike' ? 'active' : ''; ?>" 
-                                                            data-answer-id="<?php echo $answer['id']; ?>" 
-                                                            data-vote-type="dislike">
-                                                        <i class="fas fa-thumbs-down"></i>
-                                                        <span class="dislikes-count"><?php echo $answer['dislikes']; ?></span>
-                                                    </button>
-                                                </div>
+                                                <p style="color: #333 !important; font-size: 0.95rem; line-height: 1.6; margin: 0;"><?php echo htmlspecialchars($answer['content']); ?></p>
                                             </div>
                                         <?php 
                                                 endwhile;
@@ -192,144 +242,311 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle vote buttons
-    document.querySelectorAll('.vote-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const answerId = this.dataset.answerId;
-            const voteType = this.dataset.voteType;
-            const answerItem = this.closest('.answer-item');
-            const likesCount = answerItem.querySelector('.likes-count');
-            const dislikesCount = answerItem.querySelector('.dislikes-count');
-            const likeBtn = answerItem.querySelector('[data-vote-type="like"]');
-            const dislikeBtn = answerItem.querySelector('[data-vote-type="dislike"]');
 
-            fetch('vote_answer.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `answer_id=${answerId}&vote_type=${voteType}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update counts
-                    likesCount.textContent = data.likes;
-                    dislikesCount.textContent = data.dislikes;
-
-                    // Update button states
-                    if (data.user_vote === 'like') {
-                        likeBtn.classList.add('active');
-                        dislikeBtn.classList.remove('active');
-                    } else if (data.user_vote === 'dislike') {
-                        likeBtn.classList.remove('active');
-                        dislikeBtn.classList.add('active');
-                    } else {
-                        likeBtn.classList.remove('active');
-                        dislikeBtn.classList.remove('active');
-                    }
-                } else {
-                    alert(data.error || 'An error occurred while processing your vote');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while processing your vote');
-            });
-        });
-    });
 });
 </script>
 
+<!-- Modern styles applied from layout.php -->
 <style>
-.card {
-    border: 1px solid rgba(0,0,0,.125);
-    margin-bottom: 1rem;
-}
-
-.card-body {
-    padding: 1rem;
-}
-
-.card-title {
-    margin-bottom: 0.5rem;
-    font-size: 1.1rem;
-}
-
-.card-text {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
+/* Specific styling for answers and voting system */
 .answers-section {
-    margin-top: 0.5rem !important;
+    margin-top: 0.75rem !important;
 }
 
 .answers-section [role="button"] {
     cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0.25rem 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0.5rem 0;
+    border-radius: 8px;
+}
+
+.answers-section [role="button"]:hover {
+    background-color: #f8f9fa;
 }
 
 .answers-section [role="button"] h6 {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     margin: 0;
+    font-weight: 600;
+    color: #2563eb !important;
+}
+
+/* Dark mode overrides for answers section */
+[data-theme="dark"] .answers-section [role="button"]:hover {
+    background-color: #2d3748;
+}
+
+[data-theme="dark"] .answers-section [role="button"] h6 {
+    color: #4a90e2 !important;
 }
 
 .answer-item {
-    padding: 0.5rem !important;
-    margin-bottom: 0.5rem !important;
-    border-left: 2px solid #007bff;
+    padding: 1rem !important;
+    margin-bottom: 0.75rem !important;
+    border-left: 3px solid var(--primary-color);
+    background: #f8f9fa !important;
+    border-radius: 0 12px 12px 0;
+    transition: all 0.3s ease;
+}
+
+.answer-item:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
 }
 
 .answer-item p {
-    font-size: 0.9rem;
-    margin: 0.25rem 0 0 0;
+    font-size: 0.95rem;
+    margin: 0.5rem 0;
+    line-height: 1.6;
+    color: #333 !important;
+    font-weight: 500;
 }
 
-.text-muted small {
-    font-size: 0.8rem;
+/* Dark mode overrides for answer items */
+[data-theme="dark"] .answer-item {
+    background: #2d3748 !important;
+    border-left-color: #4a90e2;
 }
 
-.badge {
-    font-size: 0.75rem;
-    padding: 0.25em 0.5em;
+[data-theme="dark"] .answer-item p {
+    color: #e2e8f0 !important;
 }
 
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
+[data-theme="dark"] .answer-item small {
+    color: #a0aec0 !important;
 }
 
-.collapse {
-    margin-top: 0.5rem;
+[data-theme="dark"] .answer-item strong {
+    color: #4a90e2 !important;
+}
+
+[data-theme="dark"] .answer-item p {
+    color: #e2e8f0 !important;
 }
 
 .vote-buttons {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .vote-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 20px;
+    border: 2px solid var(--neutral-200);
+    background: white;
+    color: var(--neutral-700);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+}
+
+.vote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .vote-btn.active {
-    background-color: var(--bs-primary);
+    background: var(--gradient-primary);
+    border-color: var(--primary-color);
     color: white;
+    box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.3);
 }
 
 .vote-btn.active[data-vote-type="dislike"] {
-    background-color: var(--bs-danger);
-    color: white;
+    background: var(--gradient-primary);
+    border-color: var(--accent-danger);
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
 }
 
 .vote-btn i {
-    font-size: 0.9rem;
+    font-size: 1rem;
+}
+
+/* Modern Specialist Cards */
+.specialist-card {
+    background: #fff;
+    border: 1px solid var(--neutral-200);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    box-shadow: var(--shadow-sm);
+}
+
+.specialist-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    border-color: var(--primary-color);
+}
+
+.specialist-avatar {
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-md);
+}
+
+.specialist-info h6 {
+    font-weight: 600;
+    color: var(--neutral-900);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.specialist-info small {
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+}
+
+.online-status-indicator {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.online-status-indicator.online {
+    color: var(--accent-success);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.online-status-indicator.offline {
+    color: var(--secondary-color);
+    background: var(--neutral-100);
+}
+
+.specialist-actions .btn {
+    border-radius: 12px;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+}
+
+.specialist-stats {
+    border-top: 1px solid var(--neutral-100);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.specialist-stats small {
+    color: var(--secondary-color);
+    font-size: 0.8rem;
+}
+
+/* Modern Dropdown Styles */
+.online-specialists-compact {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.specialists-dropdown {
+    min-width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--neutral-200);
+    border-radius: 16px;
+    box-shadow: var(--shadow-xl);
+    background: white;
+}
+
+.specialist-item {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--neutral-100);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.specialist-item:hover {
+    background-color: var(--neutral-50);
+    text-decoration: none;
+    transform: translateX(4px);
+}
+
+.specialist-item:last-child {
+    border-bottom: none;
+}
+
+.specialist-avatar-small {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.specialist-info-compact {
+    margin-right: 0.75rem;
+}
+
+.specialist-name {
+    font-weight: 600;
+    color: var(--neutral-900);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.specialist-info-compact small {
+    color: var(--secondary-color);
+    font-size: 0.8rem;
+}
+
+.online-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.online-indicator i {
+    font-size: 0.75rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.dropdown-toggle {
+    border-radius: 12px;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    border: 2px solid var(--neutral-200);
+    background: white;
+    color: var(--primary-color);
+}
+
+.dropdown-toggle:hover {
+    border-color: var(--primary-color);
+    background: var(--neutral-50);
+}
+
+.dropdown-toggle:focus {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+    border-color: var(--primary-color);
 }
 </style>

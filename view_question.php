@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in and is admin or specialist
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || 
-   ($_SESSION["role"] !== "admin" && $_SESSION["role"] !== "specialist")){
+   ($_SESSION["role"] !== "admin" && $_SESSION["role"] !== "specialist" && $_SESSION["role"] !== "asker")){
     header("location: login.php");
     exit;
 }
@@ -40,7 +40,7 @@ if($stmt = mysqli_prepare($conn, $sql)){
 }
 
 // Fetch answers
-$sql = "SELECT a.*, u.username, u.role 
+$sql = "SELECT a.*, u.username, u.role, a.id as answer_id
         FROM answers a 
         JOIN users u ON a.user_id = u.id 
         WHERE a.question_id = ? 
@@ -62,9 +62,38 @@ $page_title = "View Question";
 ob_start();
 ?>
 
+<style>
+/* Fix card stretching: remove flex and set height to auto for this page only */
+.card {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin-bottom: 6px !important;
+}
+.card-body {
+    display: block !important;
+    padding: 8px 12px 4px 12px !important;
+}
+/* Ensure back button stays vertically centered and fixed height */
+.d-flex.gap-2 {
+    align-items: center !important;
+    height: 48px;
+}
+.btn.btn-outline-secondary {
+    height: 40px;
+    min-width: 90px;
+    line-height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+</style>
+
 <div class="container py-4">
     <div class="row">
-        <div class="col-lg-8 mx-auto">
+        <div class="col-12">
             <!-- Question Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -76,7 +105,17 @@ ob_start();
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="dashboard.php" class="btn btn-outline-secondary">
+                    <?php
+                    $dashboardHref = "dashboard.php";
+                    if ($_SESSION["role"] === "admin") {
+                        $dashboardHref = "admin/dashboard.php";
+                    } elseif ($_SESSION["role"] === "specialist") {
+                        $dashboardHref = "specialist/dashboard.php";
+                    } elseif ($_SESSION["role"] === "student") {
+                        $dashboardHref = "dashboard.php";
+                    }
+                    ?>
+                    <a href="<?php echo $dashboardHref; ?>" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-1"></i> Back
                     </a>
                     <?php if($_SESSION["role"] === "admin"): ?>
@@ -105,9 +144,11 @@ ob_start();
                     <!-- Question Actions -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div class="d-flex gap-2">
+                            <?php if ($_SESSION["role"] === "specialist"): ?>
                             <button class="btn btn-sm btn-outline-primary" onclick="toggleAnswerForm()">
                                 <i class="fas fa-reply me-1"></i> Answer
                             </button>
+                            <?php endif; ?>
                             <button class="btn btn-sm btn-outline-secondary" onclick="toggleComments()">
                                 <i class="fas fa-comments me-1"></i> Comments
                             </button>
@@ -117,6 +158,7 @@ ob_start();
             </div>
 
             <!-- Answer Form (Hidden by default) -->
+            <?php if ($_SESSION["role"] === "specialist"): ?>
             <div id="answerForm" class="card mb-4 d-none">
                 <div class="card-body">
                     <h5 class="card-title mb-3">Your Answer</h5>
@@ -137,6 +179,7 @@ ob_start();
                     </form>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Answers Section -->
             <div class="answers-section">
@@ -183,6 +226,7 @@ ob_start();
                         <div class="answer-content">
                             <?php echo nl2br(htmlspecialchars($answer['content'])); ?>
                         </div>
+
                     </div>
                 </div>
                 <?php endforeach; ?>

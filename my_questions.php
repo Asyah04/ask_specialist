@@ -61,7 +61,7 @@ ob_start();
                                     <?php echo ucfirst($question['status']); ?>
                                 </span>
                                 <a href="view_question.php?id=<?php echo $question['id']; ?>" class="btn btn-outline-primary btn-sm">
-                                    View Question
+                                    View Answes
                                 </a>
                             </div>
                         </div>

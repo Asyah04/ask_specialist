@@ -8,7 +8,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     exit;
 }
 
-// Get all conversations for this user
+// Get all conversations for this user with online status
 $stmt = $conn->prepare("
     SELECT DISTINCT 
         CASE 
@@ -16,6 +16,8 @@ $stmt = $conn->prepare("
             ELSE m.sender_id 
         END as other_user_id,
         u.username as other_username,
+        os.is_online,
+        os.last_seen,
         (SELECT message FROM messages 
          WHERE ((sender_id = ? AND receiver_id = other_user_id) 
                 OR (sender_id = other_user_id AND receiver_id = ?))
@@ -33,6 +35,7 @@ $stmt = $conn->prepare("
         WHEN m.sender_id = ? THEN m.receiver_id 
         ELSE m.sender_id 
     END
+    LEFT JOIN online_status os ON u.id = os.user_id
     WHERE m.sender_id = ? OR m.receiver_id = ?
     ORDER BY last_message_time DESC
 ");
@@ -40,13 +43,12 @@ $stmt->bind_param("iiiiiiiii", $_SESSION["id"], $_SESSION["id"], $_SESSION["id"]
 $stmt->execute();
 $conversations = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-$page_title = "My Messages";
+$page_title = "Chat History";
 ob_start();
 ?>
 
 <div class="messages-container">
-    <h3 class="p-3 border-bottom">Chat History</h3>
-    
+
     <?php if(empty($conversations)): ?>
         <div class="no-messages">
             <i class="fas fa-comments fa-3x mb-3"></i>
@@ -62,9 +64,26 @@ ob_start();
                     <div class="conversation-info">
                         <div class="conversation-header">
                             <span class="username"><?= htmlspecialchars($conv['other_username']) ?></span>
-                            <span class="last-message-time">
-                                <?= date('H:i', strtotime($conv['last_message_time'])) ?>
-                            </span>
+                            <div class="time-with-status">
+                                <span class="last-message-time">
+                                    <?= date('H:i', strtotime($conv['last_message_time'])) ?>
+                                </span>
+                                <div class="online-status-indicator <?= $conv['is_online'] ? 'online' : 'offline' ?>">
+                                    <?php if($conv['is_online']): ?>
+                                        <i class="fas fa-circle text-success"></i>
+                                        <small class="status-text">Online</small>
+                                    <?php else: ?>
+                                        <i class="fas fa-circle text-muted"></i>
+                                        <small class="status-text">
+                                            <?php if($conv['last_seen']): ?>
+                                                Last seen <?= date('H:i', strtotime($conv['last_seen'])) ?>
+                                            <?php else: ?>
+                                                Offline
+                                            <?php endif; ?>
+                                        </small>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
                         <div class="last-message">
                             <?= htmlspecialchars($conv['last_message']) ?>
@@ -133,13 +152,54 @@ ob_start();
     .conversation-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 5px;
+    }
+
+    .time-with-status {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
     }
 
     .username {
         font-weight: bold;
         color: #333;
+    }
+
+    .online-status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .online-status-indicator.online .status-text {
+        color: #28a745;
+        font-weight: 500;
+    }
+
+    .online-status-indicator.offline .status-text {
+        color: #6c757d;
+    }
+
+    .online-status-indicator i {
+        font-size: 0.6rem;
+    }
+
+    .online-status-indicator.online i {
+        animation: pulse 2s infinite;
+    }
+
+    .status-text {
+        font-size: 0.7rem;
+        margin: 0;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
     }
 
     .last-message-time {
@@ -170,6 +230,108 @@ ob_start();
         color: #666;
     }
 </style>
+
+<script>
+let updateInterval;
+
+function updateConversations() {
+    fetch('fetch_conversations.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => response.json())
+    .then(conversations => {
+        if(conversations && !conversations.error) {
+            updateConversationList(conversations);
+        }
+    })
+    .catch(error => {
+        console.log('Failed to update conversations:', error);
+    });
+}
+
+function updateConversationList(conversations) {
+    const conversationList = document.querySelector('.conversation-list');
+    if(!conversationList) return;
+    
+    conversationList.innerHTML = '';
+    
+    conversations.forEach(conv => {
+        const conversationItem = document.createElement('a');
+        conversationItem.href = `chat.php?receiver_id=${conv.other_user_id}`;
+        conversationItem.className = 'conversation-item';
+        
+        conversationItem.innerHTML = `
+            <div class="profile-circle">
+                ${conv.other_username.charAt(0).toUpperCase()}
+            </div>
+            <div class="conversation-info">
+                <div class="conversation-header">
+                    <span class="username">${escapeHtml(conv.other_username)}</span>
+                    <div class="time-with-status">
+                        <span class="last-message-time">
+                            ${formatTime(conv.last_message_time)}
+                        </span>
+                        <div class="online-status-indicator ${conv.is_online ? 'online' : 'offline'}">
+                            ${conv.is_online ? 
+                                '<i class="fas fa-circle text-success"></i><small class="status-text">Online</small>' : 
+                                `<i class="fas fa-circle text-muted"></i><small class="status-text">${conv.last_seen ? 'Last seen ' + formatTime(conv.last_seen) : 'Offline'}</small>`
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="last-message">
+                    ${escapeHtml(conv.last_message)}
+                    ${conv.unread_count > 0 ? `<span class="unread-badge">${conv.unread_count}</span>` : ''}
+                </div>
+            </div>
+        `;
+        
+        conversationList.appendChild(conversationItem);
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatTime(timestamp) {
+    if(!timestamp) return '';
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+    });
+}
+
+// Start real-time updates when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Update conversations every 3 seconds
+    updateInterval = setInterval(updateConversations, 3000);
+    
+    // Initial update
+    updateConversations();
+});
+
+// Update when page becomes visible
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        updateConversations();
+    }
+});
+
+// Clean up interval when page unloads
+window.addEventListener('beforeunload', function() {
+    if(updateInterval) {
+        clearInterval(updateInterval);
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();

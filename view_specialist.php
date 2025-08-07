@@ -12,13 +12,7 @@ require_once "config/database.php";
 
 // Get all approved specialists with their categories
 $sql = "SELECT u.id, u.username, u.email, c.name as category_name,
-        (SELECT COUNT(*) FROM answers WHERE user_id = u.id) as total_answers,
-        (SELECT COUNT(*) FROM answer_votes av 
-         JOIN answers a ON av.answer_id = a.id 
-         WHERE a.user_id = u.id AND av.vote_type = 'like') as total_likes,
-        (SELECT COUNT(*) FROM answer_votes av 
-         JOIN answers a ON av.answer_id = a.id 
-         WHERE a.user_id = u.id AND av.vote_type = 'dislike') as total_dislikes
+        (SELECT COUNT(*) FROM answers WHERE user_id = u.id) as total_answers
         FROM users u 
         JOIN specialist_applications sa ON u.id = sa.user_id 
         JOIN categories c ON sa.category_id = c.id 
@@ -44,7 +38,7 @@ ob_start();
         .profile-circle {
             width: 60px;
             height: 60px;
-            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            /* background: linear-gradient(to right, var(--primary-color), var(--accent-color)); */
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -67,7 +61,7 @@ ob_start();
         .profile-circle {
             width: 80px;
             height: 80px;
-            background: linear-gradient(45deg, #4a90e2, #67b26f);
+            background: linear-gradient(-90deg, #4a90e2,rgb(65, 92, 123));
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -168,7 +162,7 @@ ob_start();
         }
 
         .btn-message {
-            background: linear-gradient(45deg, #4a90e2, #67b26f);
+            background: linear-gradient(-90deg, #4a90e2,rgb(65, 92, 123));
             color: white;
             border: none;
             padding: 8px 16px;
@@ -228,20 +222,7 @@ ob_start();
                                         <small class="text-muted">Answers</small>
                                     </div>
                                 </div>
-                                <div class="col">
-                                    <div class="stat-item">
-                                        <i class="fas fa-thumbs-up stat-icon likes-icon"></i>
-                                        <h5 class="mb-0"><?php echo $specialist['total_likes']; ?></h5>
-                                        <small class="text-muted">Likes</small>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="stat-item">
-                                        <i class="fas fa-thumbs-down stat-icon dislikes-icon"></i>
-                                        <h5 class="mb-0"><?php echo $specialist['total_dislikes']; ?></h5>
-                                        <small class="text-muted">Dislikes</small>
-                                    </div>
-                                </div>
+
                             </div>
                             <div class="text-center mt-3">
                                 <a href="chat.php?receiver_id=<?php echo $specialist['id']; ?>" class="btn btn-message">

@@ -21,25 +21,20 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $category = mysqli_fetch_assoc($result);
 
-// Get vote statistics
+// Get answer statistics
 $sql = "SELECT 
             COUNT(DISTINCT a.id) as total_answers,
-            SUM(CASE WHEN av.vote_type = 'like' THEN 1 ELSE 0 END) as total_likes,
-            SUM(CASE WHEN av.vote_type = 'dislike' THEN 1 ELSE 0 END) as total_dislikes,
-            COUNT(DISTINCT CASE WHEN av.vote_type = 'like' THEN a.id END) as liked_answers,
-            COUNT(DISTINCT CASE WHEN av.vote_type = 'dislike' THEN a.id END) as disliked_answers
+            (SELECT COUNT(*) FROM answer_votes WHERE answer_id IN (SELECT id FROM answers WHERE user_id = ?) AND vote_type = 'like') as total_likes,
+            (SELECT COUNT(*) FROM answer_votes WHERE answer_id IN (SELECT id FROM answers WHERE user_id = ?) AND vote_type = 'dislike') as total_dislikes
         FROM answers a 
-        LEFT JOIN answer_votes av ON a.id = av.answer_id 
         WHERE a.user_id = ?";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "i", $_SESSION["id"]);
+mysqli_stmt_bind_param($stmt, "iii", $_SESSION["id"], $_SESSION["id"], $_SESSION["id"]);
 mysqli_stmt_execute($stmt);
 $stats = mysqli_stmt_get_result($stmt)->fetch_assoc();
 
-// Get recent answers with vote counts
-$sql = "SELECT a.*, q.title as question_title, q.id as question_id,
-        (SELECT COUNT(*) FROM answer_votes WHERE answer_id = a.id AND vote_type = 'like') as likes,
-        (SELECT COUNT(*) FROM answer_votes WHERE answer_id = a.id AND vote_type = 'dislike') as dislikes
+// Get recent answers
+$sql = "SELECT a.*, q.title as question_title, q.id as question_id
         FROM answers a 
         JOIN questions q ON a.question_id = q.id 
         WHERE a.user_id = ? 
@@ -98,6 +93,7 @@ ob_start();
                                 <small class="text-muted">Dislikes</small>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -126,14 +122,7 @@ ob_start();
                                         </small>
                                     </div>
                                     <p class="mb-1"><?php echo substr(htmlspecialchars($answer['content']), 0, 200) . '...'; ?></p>
-                                    <div class="vote-stats">
-                                        <span class="text-success me-2">
-                                            <i class="fas fa-thumbs-up"></i> <?php echo $answer['likes']; ?>
-                                        </span>
-                                        <span class="text-danger">
-                                            <i class="fas fa-thumbs-down"></i> <?php echo $answer['dislikes']; ?>
-                                        </span>
-                                    </div>
+
                                 </div>
                             <?php endwhile; ?>
                         </div>
@@ -147,13 +136,6 @@ ob_start();
 </div>
 
 <style>
-.vote-stats {
-    font-size: 0.9rem;
-}
-
-.vote-stats i {
-    margin-right: 0.25rem;
-}
 
 .list-group-item {
     border-left: 3px solid #007bff;

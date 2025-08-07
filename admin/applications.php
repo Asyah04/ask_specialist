@@ -9,7 +9,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION[
 
 require_once "../config/database.php";
 
-// Handle application status updates
+
 if(isset($_POST['application_id']) && isset($_POST['status'])) {
     $application_id = $_POST['application_id'];
     $status = $_POST['status'];
@@ -40,6 +40,21 @@ if(isset($_POST['application_id']) && isset($_POST['status'])) {
         $error_message = "Error updating application: " . $e->getMessage();
     }
 }
+
+// Handle delete action
+if (isset($_POST['application_id']) && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $application_id = $_POST['application_id'];
+
+    try {
+        $stmt = mysqli_prepare($conn, "DELETE FROM specialist_applications WHERE id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $application_id);
+        mysqli_stmt_execute($stmt);
+        $success_message = "Application deleted successfully.";
+    } catch(Exception $e) {
+        $error_message = "Failed to delete application: " . $e->getMessage();
+    }
+}
+
 
 // Get all applications with user details
 $sql = "SELECT sa.*, u.username, u.email, u.created_at as user_created_at 
@@ -99,14 +114,9 @@ ob_start();
                                     <?php while($app = mysqli_fetch_assoc($applications)): ?>
                                         <tr>
                                             <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar me-2">
-                                                        <?php echo strtoupper(substr($app['username'], 0, 1)); ?>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="mb-0"><?php echo htmlspecialchars($app['username']); ?></h6>
-                                                        <small class="text-muted">Member since <?php echo date('M Y', strtotime($app['user_created_at'])); ?></small>
-                                                    </div>
+                                                <div>
+                                                    <h6 class="mb-0"><?php echo htmlspecialchars($app['username']); ?></h6>
+                                                    <small class="text-muted">Member since <?php echo date('M Y', strtotime($app['user_created_at'])); ?></small>
                                                 </div>
                                             </td>
                                             <td><?php echo htmlspecialchars($app['email']); ?></td>
@@ -126,8 +136,7 @@ ob_start();
                                                 <span class="badge bg-<?php echo $app['status'] == 'pending' ? 'warning' : ($app['status'] == 'approved' ? 'success' : 'danger'); ?>">
                                                     <?php echo ucfirst($app['status']); ?>
                                                 </span>
-                                            </td>
-                                            <td>
+                                            
                                                 <?php if($app['status'] == 'pending'): ?>
                                                     <form id="approveForm<?php echo $app['id']; ?>" action="" method="post" style="display: inline;">
                                                         <input type="hidden" name="application_id" value="<?php echo $app['id']; ?>">
@@ -146,6 +155,15 @@ ob_start();
                                                         </button>
                                                     </form>
                                                 <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <form id="deleteForm<?php echo $app['id']; ?>" action="" method="post" style="display: inline;">
+                                                    <input type="hidden" name="application_id" value="<?php echo $app['id']; ?>">
+                                                    <input type="hidden" name="action" value="delete">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteApplication(<?php echo $app['id']; ?>)">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     <?php endwhile; ?>
@@ -226,6 +244,12 @@ function approveApplication(id) {
 function rejectApplication(id) {
     if(confirm('Are you sure you want to reject this application?')) {
         document.getElementById('rejectForm' + id).submit();
+    }
+}
+
+function deleteApplication(id) {
+    if(confirm('Are you sure you want to permanently delete this application?')) {
+        document.getElementById('deleteForm' + id).submit();
     }
 }
 </script>
