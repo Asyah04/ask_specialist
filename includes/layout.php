@@ -1775,16 +1775,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
         // Update online status
         function updateOnlineStatus() {
-            // Determine the correct path based on current directory
-            const currentPath = window.location.pathname;
-            let statusPath = 'update_online_status.php';
-            
-            // If we're in admin or specialist directory, go up one level
-            if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
-                statusPath = '../update_online_status.php';
-            }
-            
-            fetch(statusPath)
+            fetch('update_online_status.php')
                 .then(response => {
                     if (!response.ok) {
                         console.error('Failed to update online status');

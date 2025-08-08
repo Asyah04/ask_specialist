@@ -245,16 +245,7 @@ let lastActivity = Date.now();
 
 // Update user's online status
 function updateUserOnlineStatus() {
-    // Determine the correct path based on current directory
-    const currentPath = window.location.pathname;
-    let statusPath = 'update_online_status.php';
-    
-    // If we're in admin or specialist directory, go up one level
-    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
-        statusPath = '../update_online_status.php';
-    }
-    
-    fetch(statusPath, {
+    fetch('update_online_status.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -264,16 +255,7 @@ function updateUserOnlineStatus() {
 }
 
 function updateOnlineStatus() {
-    // Determine the correct path based on current directory
-    const currentPath = window.location.pathname;
-    let checkPath = 'check_online_status.php?user_id=<?= $receiver_id ?>';
-    
-    // If we're in admin or specialist directory, go up one level
-    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
-        checkPath = '../check_online_status.php?user_id=<?= $receiver_id ?>';
-    }
-    
-    fetch(checkPath)
+    fetch('check_online_status.php?user_id=<?= $receiver_id ?>')
         .then(response => response.json())
         .then(data => {
             const statusElement = document.getElementById('onlineStatus');
@@ -289,16 +271,7 @@ function updateOnlineStatus() {
 }
 
 function loadMessages() {
-    // Determine the correct path based on current directory
-    const currentPath = window.location.pathname;
-    let messagesPath = 'fetch_messages.php';
-    
-    // If we're in admin or specialist directory, go up one level
-    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
-        messagesPath = '../fetch_messages.php';
-    }
-    
-    fetch(messagesPath, {
+    fetch('fetch_messages.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -371,16 +344,7 @@ function sendMessage() {
             id: 'temp-' + Date.now()
         });
         
-        // Determine the correct path based on current directory
-        const currentPath = window.location.pathname;
-        let sendPath = 'send_message.php';
-        
-        // If we're in admin or specialist directory, go up one level
-        if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
-            sendPath = '../send_message.php';
-        }
-        
-        fetch(sendPath, {
+        fetch('send_message.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -493,16 +457,7 @@ document.addEventListener('visibilitychange', function() {
 
 // Update status when user leaves/closes page
 window.addEventListener('beforeunload', function() {
-    // Determine the correct path based on current directory
-    const currentPath = window.location.pathname;
-    let statusPath = 'update_online_status.php';
-    
-    // If we're in admin or specialist directory, go up one level
-    if (currentPath.includes('/admin/') || currentPath.includes('/specialist/')) {
-        statusPath = '../update_online_status.php';
-    }
-    
-    navigator.sendBeacon(statusPath, 'action=offline');
+    navigator.sendBeacon('update_online_status.php', 'action=offline');
 });
 </script>
 

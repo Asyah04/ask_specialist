@@ -105,7 +105,9 @@ ob_start();
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
-          
+            <!-- <div class="d-flex align-items-center mb-3">
+                <h1 class="h2 mb-0">Ask a Question</h1>
+            </div> -->
 
         <?php if(!empty($success_message)): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">

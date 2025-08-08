@@ -50,7 +50,7 @@ ob_start();
     <?php if(mysqli_num_rows($questions) > 0): ?>
         <div class="row">
             <?php while($question = mysqli_fetch_assoc($questions)): ?>
-                <div class="col-md-6 mb-4">
+                <div class="col-12 mb-4">
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($question['title']); ?></h5>
@@ -71,7 +71,7 @@ ob_start();
                                 <?php endif; ?>
                                 <div>
                                     <?php if($question['status'] === 'open'): ?>
-                                        <a href="../answer.php?question_id=<?php echo $question['id']; ?>" class="btn btn-primary btn-sm">
+                                        <a href="../answer.php?question_id=<?php echo $question['id']; ?>" class="btn btn-dark btn-sm">
                                             Answer Question
                                         </a>
                                     <?php endif; ?>

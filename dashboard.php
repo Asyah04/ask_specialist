@@ -162,7 +162,7 @@ ob_start();
                                         <h6 class="me-2">Answers (<?php echo $row['answer_count']; ?>)</h6>
                                         <i class="fas fa-chevron-down"></i>
                                     </div>
-                                    <div class="collapse" id="answers-<?php echo $row['id']; ?>" style="padding-top: 0.75rem;">
+                                    <div class="collapse" id="answers-<?php echo $row['id']; ?>">
                                         <?php 
                                         // Get answers for this question
                                         $answers_sql = "SELECT a.*, u.username as answerer_name, u.role as answerer_role
@@ -176,18 +176,19 @@ ob_start();
                                                 $answers_result = mysqli_stmt_get_result($answers_stmt);
                                                 while($answer = mysqli_fetch_assoc($answers_result)):
                                         ?>
-                                            <div class="answer-item">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <small style="color: #6c757d !important; font-size: 0.875rem;">
+                                            <div class="answer-item bg-light rounded">
+                                                <div class="d-flex justify-content-between">
+                                                    <small class="text-muted">
                                                         Answered by 
-                                                        <strong style="color: #2563eb !important;"><?php echo htmlspecialchars($answer['answerer_name']); ?></strong>
+                                                        <strong><?php echo htmlspecialchars($answer['answerer_name']); ?></strong>
                                                         <?php if($answer['answerer_role'] === 'specialist'): ?>
-                                                            <span class="badge bg-success ms-1" style="font-size: 0.75rem;">Specialist</span>
+                                                            <span class="badge bg-success ms-1">Specialist</span>
                                                         <?php endif; ?>
                                                         on <?php echo date('M d, Y', strtotime($answer['created_at'])); ?>
                                                     </small>
                                                 </div>
-                                                <p style="color: #333 !important; font-size: 0.95rem; line-height: 1.6; margin: 0;"><?php echo htmlspecialchars($answer['content']); ?></p>
+                                                <p><?php echo htmlspecialchars($answer['content']); ?></p>
+
                                             </div>
                                         <?php 
                                                 endwhile;
@@ -261,30 +262,21 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .answers-section [role="button"]:hover {
-    background-color: #f8f9fa;
+    background-color: var(--neutral-50);
 }
 
 .answers-section [role="button"] h6 {
     font-size: 0.95rem;
     margin: 0;
     font-weight: 600;
-    color: #2563eb !important;
-}
-
-/* Dark mode overrides for answers section */
-[data-theme="dark"] .answers-section [role="button"]:hover {
-    background-color: #2d3748;
-}
-
-[data-theme="dark"] .answers-section [role="button"] h6 {
-    color: #4a90e2 !important;
+    color: var(--primary-color);
 }
 
 .answer-item {
     padding: 1rem !important;
     margin-bottom: 0.75rem !important;
     border-left: 3px solid var(--primary-color);
-    background: #f8f9fa !important;
+    background: var(--neutral-50);
     border-radius: 0 12px 12px 0;
     transition: all 0.3s ease;
 }
@@ -298,30 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 0.95rem;
     margin: 0.5rem 0;
     line-height: 1.6;
-    color: #333 !important;
-    font-weight: 500;
-}
-
-/* Dark mode overrides for answer items */
-[data-theme="dark"] .answer-item {
-    background: #2d3748 !important;
-    border-left-color: #4a90e2;
-}
-
-[data-theme="dark"] .answer-item p {
-    color: #e2e8f0 !important;
-}
-
-[data-theme="dark"] .answer-item small {
-    color: #a0aec0 !important;
-}
-
-[data-theme="dark"] .answer-item strong {
-    color: #4a90e2 !important;
-}
-
-[data-theme="dark"] .answer-item p {
-    color: #e2e8f0 !important;
+    color: var(--neutral-900);
 }
 
 .vote-buttons {
