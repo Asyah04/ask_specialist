@@ -63,6 +63,133 @@ ob_start();
 ?>
 
 <style>
+/* Dark Mode Support for View Question Page */
+[data-theme="dark"] .card {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .card-body {
+    background-color: var(--card-background) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-title {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .question-content {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-content {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .fw-bold {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4 {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answers-section h3 {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .form-control {
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .form-control:focus {
+    background-color: var(--input-bg) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Force dark mode text visibility */
+[data-theme="dark"] * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card small,
+[data-theme="dark"] .card i {
+    color: var(--text-muted) !important;
+}
+
+/* Specific text color fixes for Question and Answers */
+[data-theme="dark"] .container * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answers-section * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .question-content * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-content * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .d-flex * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .d-flex .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .d-flex .fw-bold {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .d-flex small {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .d-flex i {
+    color: var(--text-muted) !important;
+}
+
+/* Ensure all text in the page is visible */
+[data-theme="dark"] p {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] span {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] div {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .small {
+    color: var(--text-muted) !important;
+}
+
 /* Fix card stretching: remove flex and set height to auto for this page only */
 .card {
     display: block !important;

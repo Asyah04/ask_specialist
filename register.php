@@ -378,28 +378,30 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <span class="invalid-feedback"><?php echo $address_err; ?></span>
                     </div>
                 </div>
-                <div class="row">
+               <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Password</label>
                         <div class="password-container">
                             <input type="password" name="password" id="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>">
-                            <button type="button" class="password-toggle" onclick="togglePassword('password', 'toggleIcon1')">
-                                <i id="toggleIcon1" class="🙈">🙈</i>
+                            <button type="button" class="password-toggle" onclick="togglePassword('password', 'toggleIcon1')" style="background:none; border:none;">
+                                <i id="toggleIcon1" class="fa-solid fa-eye-slash"></i>
                             </button>
                         </div>
                         <span class="invalid-feedback"><?php echo $password_err; ?></span>
                     </div>
+
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Confirm Password</label>
                         <div class="password-container">
                             <input type="password" name="confirm_password" id="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $confirm_password; ?>">
-                            <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', 'toggleIcon2')">
-                                <i id="toggleIcon2" class="🙈">🙈</i>
+                            <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', 'toggleIcon2')" style="background:none; border:none;">
+                                <i id="toggleIcon2" class="fa-solid fa-eye-slash"></i>
                             </button>
                         </div>
                         <span class="invalid-feedback"><?php echo $confirm_password_err; ?></span>
                     </div>
                 </div>
+
                 <div class="mb-3">
                     <input type="submit" class="btn btn-primary w-100" value="Register as Student">
                 </div>
@@ -414,15 +416,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         function togglePassword(fieldId, iconId) {
             const passwordField = document.getElementById(fieldId);
             const toggleIcon = document.getElementById(iconId);
-            
+
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
-                toggleIcon.innerHTML = '👁️'; // Eye open - "Naona" when password is visible
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
             } else {
                 passwordField.type = 'password';
-                toggleIcon.innerHTML = '🙈'; // Eyes covered - "Sijaona" when password is hidden
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
             }
         }
     </script>
+
 </body>
 </html> 

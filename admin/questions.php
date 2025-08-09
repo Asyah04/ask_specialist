@@ -219,6 +219,63 @@ ob_start();
 </div>
 
 <style>
+/* Dark Mode Support for Admin Questions Page */
+[data-theme="dark"] .collapse-row {
+    background-color: var(--card-background) !important;
+}
+
+[data-theme="dark"] .answer-item {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-item .fw-bold {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-item small {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .answer-content {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .card-body {
+    background-color: var(--card-background) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-title {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-text {
+    color: var(--text-color) !important;
+}
+
+/* Force dark mode text visibility */
+[data-theme="dark"] * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card small,
+[data-theme="dark"] .card i {
+    color: var(--text-muted) !important;
+}
+
 .collapse-row {
     background-color: #f8f9fa;
 }

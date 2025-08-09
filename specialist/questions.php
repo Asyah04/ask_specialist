@@ -40,6 +40,59 @@ $page_title = "Questions in My Category";
 ob_start();
 ?>
 
+<style>
+/* Dark Mode Support for Questions Page */
+[data-theme="dark"] .card {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .card-body {
+    background-color: var(--card-background) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card .card-title {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card .card-text {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card .card-text small {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .card .card-text i {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(6, 182, 212, 0.1) !important;
+    color: #22D3EE !important;
+    border-color: #06B6D4 !important;
+}
+
+/* Force dark mode text visibility */
+[data-theme="dark"] * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card small,
+[data-theme="dark"] .card i {
+    color: var(--text-muted) !important;
+}
+</style>
+
 <div class="container">
     <!-- <div class="row mb-4">
         <div class="col">

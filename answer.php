@@ -122,7 +122,7 @@ ob_start();
                                                 <?php echo ucfirst($answer['answerer_role']); ?>
                                             </span>
                                         </div>
-                                        <small class="text-muted">
+                                        <small class="text-muted" >
                                             <?php echo date('M d, Y H:i', strtotime($answer['created_at'])); ?>
                                         </small>
                                     </div>
@@ -165,6 +165,96 @@ ob_start();
         </div>
     </div>
 </div>
+
+<style>
+/* Dark Mode Specific Fixes for Answer Page */
+[data-theme="dark"] .answer-item {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-item.bg-light {
+    background-color: var(--card-background) !important;
+}
+
+[data-theme="dark"] .answer-item * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-item small.text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .answer-item .badge {
+    color: white !important;
+}
+
+[data-theme="dark"] .answers-section * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .question-details * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .question-details .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .question-details p.text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .question-details p.text-muted * {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .question-details p.text-muted small {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .question-details p.text-muted i {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .question-content {
+    color: black !important;
+}
+
+[data-theme="dark"] .answer-form-section * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-header h4 {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-body h5 {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-body p {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .question-content {
+    color: var(--text-color) !important;
+}
+
+/* Force all text to be visible in dark mode */
+[data-theme="dark"] * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .badge {
+    color: white !important;
+}
+</style>
 
 <?php
 $content = ob_get_clean();

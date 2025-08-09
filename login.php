@@ -12,6 +12,7 @@ require_once "config/database.php";
 $username = $password = "";
 $username_err = $password_err = $login_err = "";
 
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Validate username
     if(empty(trim($_POST["username"]))){
@@ -280,10 +281,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <label class="form-label">Password</label>
                     <div class="password-container">
                         <input type="password" name="password" id="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
-                        <button type="button" class="password-toggle" onclick="togglePassword()">
-                            <i id="toggleIcon" class="🙈">🙈</i>
+                        <button type="button" class="password-toggle" onclick="togglePassword()" style="background:none; border:none;">
+                            <i id="toggleIcon" class="fa-solid fa-eye-slash"></i>
                         </button>
                     </div>
+
                     <span class="invalid-feedback"><?php echo $password_err; ?></span>
                 </div>
                 <div class="mb-3">
@@ -303,12 +305,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             
             if (passwordField.type === 'password') {
                 passwordField.type = 'text';
-                toggleIcon.innerHTML = '👁️'; // Eye open - "Naona" when password is visible
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye'); 
             } else {
                 passwordField.type = 'password';
-                toggleIcon.innerHTML = '🙈'; // Eyes covered - "Sijaona" when password is hidden
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash'); 
             }
         }
     </script>
+
 </body>
 </html> 

@@ -34,7 +34,7 @@ $stats['total_questions'] = mysqli_fetch_assoc($result)['total'];
 
 
 
-// Recent applications
+
 $sql = "SELECT sa.*, u.username, u.email, c.name as category_name 
         FROM specialist_applications sa 
         JOIN users u ON sa.user_id = u.id 
@@ -69,9 +69,9 @@ ob_start();
                     <i class="fas fa-user-graduate"></i>
                 </div>
                 <div class="stats-info">
-                    <div class="stats-label">Total Students</div>
+                    <div class="stats-label">Total Asker</div>
                     <div class="stats-number"><?php echo $stats['total_students']; ?></div>
-                    <div class="stats-label">Registered Students</div>
+                    <div class="stats-label">Registered Asker</div>
                 </div>
             </div>
         </div>

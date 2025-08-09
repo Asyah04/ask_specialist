@@ -20,7 +20,7 @@ while($row = mysqli_fetch_assoc($categories_result)) {
     $categories[] = $row;
 }
 
-// Get online specialists (only those currently online)
+// Get online specialists (only those currently online within last 5 minutes)
 $specialists_sql = "SELECT u.id, u.username, u.email, c.name as category_name,
         os.is_online, os.last_seen,
         (SELECT COUNT(*) FROM answers WHERE user_id = u.id) as total_answers
@@ -28,7 +28,9 @@ $specialists_sql = "SELECT u.id, u.username, u.email, c.name as category_name,
         JOIN specialist_applications sa ON u.id = sa.user_id 
         JOIN categories c ON sa.category_id = c.id 
         JOIN online_status os ON u.id = os.user_id
-        WHERE sa.status = 'approved' AND os.is_online = 1
+        WHERE sa.status = 'approved' 
+        AND os.is_online = 1 
+        AND os.last_seen >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
         ORDER BY os.last_seen DESC";
 $specialists_result = mysqli_query($conn, $specialists_sql);
 $specialists = mysqli_fetch_all($specialists_result, MYSQLI_ASSOC);
@@ -291,6 +293,33 @@ document.addEventListener('DOMContentLoaded', function() {
     margin: 0.5rem 0;
     line-height: 1.6;
     color: var(--neutral-900);
+}
+
+/* Dark mode styling for answers section */
+[data-theme="dark"] .answer-item {
+    background: var(--card-background) !important;
+    border-left-color: var(--primary-light) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .answer-item p {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-item small {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .answer-item strong {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answers-section [role="button"] h6 {
+    color: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .answers-section [role="button"]:hover {
+    background-color: var(--table-hover) !important;
 }
 
 .vote-buttons {

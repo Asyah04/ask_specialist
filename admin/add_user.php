@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in and is an admin
+
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["role"] !== "admin"){
     header("location: ../login.php");
     exit;
@@ -12,16 +12,16 @@ require_once "../config/database.php";
 $username = $password = $email = $phone = $address = $role = "";
 $username_err = $password_err = $email_err = $phone_err = $address_err = $role_err = "";
 
-// Processing form data when form is submitted
+
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     
-    // Validate username
+  
     if(empty(trim($_POST["username"]))){
         $username_err = "Please enter a username.";
     } elseif(!preg_match('/^[a-zA-Z0-9_]+$/', trim($_POST["username"]))){
         $username_err = "Username can only contain letters, numbers, and underscores.";
     } else{
-        // Prepare a select statement
+    
         $sql = "SELECT id FROM users WHERE username = ?";
         
         if($stmt = mysqli_prepare($conn, $sql)){
@@ -44,13 +44,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
     
-    // Validate email
+   
     if(empty(trim($_POST["email"]))){
         $email_err = "Please enter an email.";
     } elseif(!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)){
         $email_err = "Please enter a valid email address.";
     } else{
-        // Check if email already exists
+    
         $sql = "SELECT id FROM users WHERE email = ?";
         
         if($stmt = mysqli_prepare($conn, $sql)){
@@ -73,11 +73,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
     
-    // Validate phone
+   
     if(empty(trim($_POST["phone"]))){
         $phone_err = "Please enter a phone number.";
     } else{
-        // Check if phone already exists
+       
         $sql = "SELECT id FROM users WHERE phone = ?";
         
         if($stmt = mysqli_prepare($conn, $sql)){
@@ -100,14 +100,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
     
-    // Validate address
+   
     if(empty(trim($_POST["address"]))){
         $address_err = "Please enter an address.";
     } else{
         $address = trim($_POST["address"]);
     }
     
-    // Validate password
+    
     if(empty(trim($_POST["password"]))){
         $password_err = "Please enter a password.";     
     } elseif(strlen(trim($_POST["password"])) < 6){
@@ -116,7 +116,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $password = trim($_POST["password"]);
     }
     
-    // Validate role
+    
     if(empty($_POST["role"])){
         $role_err = "Please select a role.";
     } elseif(!in_array($_POST["role"], ['admin', 'student', 'specialist'])){
@@ -125,12 +125,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $role = $_POST["role"];
     }
     
-    // Check input errors before inserting in database
+    
     if(empty($username_err) && empty($password_err) && empty($email_err) && empty($phone_err) && empty($address_err) && empty($role_err)){
         
-        // Prepare an insert statement
+     
         $sql = "INSERT INTO users (username, password, email, phone, address, role) VALUES (?, ?, ?, ?, ?, ?)";
-         
+         6556
         if($stmt = mysqli_prepare($conn, $sql)){
             mysqli_stmt_bind_param($stmt, "ssssss", $param_username, $param_password, $param_email, $param_phone, $param_address, $param_role);
             

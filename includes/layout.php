@@ -1390,6 +1390,136 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             color: var(--primary-light) !important;
         }
         
+        /* Dark Mode Card Text */
+        [data-theme="dark"] .card-text {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card-title {
+            color: var(--text-color) !important;
+        }
+        
+        /* Dark Mode Questions Page */
+        [data-theme="dark"] .card .card-text {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card .card-text small {
+            color: var(--text-muted) !important;
+        }
+        
+        [data-theme="dark"] .card .card-text i {
+            color: var(--text-muted) !important;
+        }
+        
+        /* Dark Mode All Cards */
+        [data-theme="dark"] .card {
+            background-color: var(--card-background) !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] .card-body {
+            background-color: var(--card-background) !important;
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card-title {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card-text {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        /* Force Dark Mode Text Visibility */
+        [data-theme="dark"] .container * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card small,
+        [data-theme="dark"] .card i {
+            color: var(--text-muted) !important;
+        }
+        
+        /* Specific Dark Mode Text Fixes */
+        [data-theme="dark"] p {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, 
+        [data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6 {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card-body p {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card-body h5 {
+            color: var(--text-color) !important;
+        }
+        
+        /* Additional Dark Mode Text Fixes */
+        [data-theme="dark"] .container * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .answers-section * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .question-content * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .answer-content * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .d-flex * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .d-flex .text-muted {
+            color: var(--text-muted) !important;
+        }
+        
+        [data-theme="dark"] .d-flex .fw-bold {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .d-flex small {
+            color: var(--text-muted) !important;
+        }
+        
+        [data-theme="dark"] .d-flex i {
+            color: var(--text-muted) !important;
+        }
+        
+        [data-theme="dark"] p {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] span {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] div {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .small {
+            color: var(--text-muted) !important;
+        }
+        
         /* Dark Mode Badges */
         [data-theme="dark"] .badge {
             border: 1px solid var(--border-color);
@@ -1666,7 +1796,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
                     </li>
                 <?php elseif($_SESSION["role"] === "specialist"): ?>
                     <li class="nav-item">
-                        <a class="nav-link <?php echo $current_page === '/specialist/dashboard.php' ? 'active' : ''; ?>" href="<?php echo $specialist_prefix; ?>dashboard.php">
+                        <a class="nav-link <?php echo $current_page === '../specialist/dashboard.php' ? 'active' : ''; ?>" href="<?php echo $specialist_prefix; ?>dashboard.php">
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Dashboard</span>
                         </a>
@@ -1775,7 +1905,14 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
         // Update online status
         function updateOnlineStatus() {
-            fetch('update_online_status.php')
+            <?php if(isset($_SESSION['user_id'])): ?>
+            fetch('update_online_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=online&user_id=<?php echo $_SESSION['user_id']; ?>'
+            })
                 .then(response => {
                     if (!response.ok) {
                         console.error('Failed to update online status');
@@ -1784,11 +1921,19 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
                 .catch(error => {
                     console.error('Error updating online status:', error);
                 });
+            <?php endif; ?>
         }
 
         // Update status immediately and then every 30 seconds
         updateOnlineStatus();
         setInterval(updateOnlineStatus, 30000);
+        
+        // Set user offline when page is unloaded
+        window.addEventListener('beforeunload', function() {
+            <?php if(isset($_SESSION['user_id'])): ?>
+            navigator.sendBeacon('update_online_status.php', 'action=offline&user_id=<?php echo $_SESSION['user_id']; ?>');
+            <?php endif; ?>
+        });
         
         // Theme Toggle Functionality
         const themeToggle = document.getElementById('themeToggle');

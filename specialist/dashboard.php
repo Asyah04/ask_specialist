@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in and is a specialist
+
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["role"] !== "specialist"){
     header("location: ../login.php");
     exit;
@@ -9,7 +9,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION[
 
 require_once "../config/database.php";
 
-// Get specialist's category
+
 $sql = "SELECT c.id, c.name as category_name 
         FROM specialist_applications sa 
         JOIN categories c ON sa.category_id = c.id 
@@ -20,7 +20,7 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $category = mysqli_fetch_assoc($result);
 
-// Get statistics
+
 $sql = "SELECT 
             (SELECT COUNT(*) FROM answers WHERE user_id = ?) as total_answers,
             (SELECT COUNT(*) FROM questions WHERE category_id = ?) as total_questions,
@@ -32,7 +32,7 @@ mysqli_stmt_bind_param($stmt, "iiiii", $_SESSION["id"], $category['id'], $catego
 mysqli_stmt_execute($stmt);
 $stats = mysqli_stmt_get_result($stmt)->fetch_assoc();
 
-// Get recent answers
+
 $sql = "SELECT a.*, q.title as question_title, q.status as question_status 
         FROM answers a 
         JOIN questions q ON a.question_id = q.id 
@@ -44,7 +44,7 @@ mysqli_stmt_bind_param($stmt, "i", $_SESSION["id"]);
 mysqli_stmt_execute($stmt);
 $recent_answers = mysqli_stmt_get_result($stmt);
 
-// Store recent answers data in array for reuse
+
 $recent_answers_data = [];
 while($answer = mysqli_fetch_assoc($recent_answers)) {
     $recent_answers_data[] = $answer;
@@ -69,17 +69,186 @@ while($question = mysqli_fetch_assoc($open_questions)) {
     $open_questions_data[] = $question;
 }
 
+// Get online askers/students (users who are not specialists and are online)
+$sql = "SELECT u.id, u.username, u.email, os.last_seen,
+        (SELECT COUNT(*) FROM questions WHERE user_id = u.id) as total_questions
+        FROM users u 
+        LEFT JOIN specialist_applications sa ON u.id = sa.user_id 
+        JOIN online_status os ON u.id = os.user_id
+        WHERE (sa.user_id IS NULL OR sa.status != 'approved')
+        AND os.is_online = 1 
+        AND os.last_seen >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+        ORDER BY os.last_seen DESC
+        LIMIT 10";
+$online_askers_result = mysqli_query($conn, $sql);
+$online_askers = mysqli_fetch_all($online_askers_result, MYSQLI_ASSOC);
+
 $page_title = "Specialist Dashboard";
 ob_start();
 ?>
 
+<style>
+/* Dark Mode Support for Specialist Dashboard */
+[data-theme="dark"] .card {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .card-body {
+    background-color: var(--card-background) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-title {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card-text {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .table {
+    background-color: var(--table-bg) !important;
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table th {
+    background-color: var(--neutral-100) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .table td {
+    background-color: var(--table-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: var(--table-hover) !important;
+}
+
+[data-theme="dark"] .question-title-cell strong {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .answer-preview-cell {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .content-preview-cell {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .stats-card {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .stats-label {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .stats-number {
+    color: var(--text-color) !important;
+}
+
+/* Force dark mode text visibility */
+[data-theme="dark"] * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .table * {
+    color: var(--text-color) !important;
+}
+
+[data-theme="dark"] .card small,
+[data-theme="dark"] .card i {
+    color: var(--text-muted) !important;
+}
+
+/* Online Askers Dropdown Styling */
+.online-askers-compact .dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+    min-width: 280px;
+}
+
+.online-askers-compact .dropdown-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.online-askers-compact .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.online-askers-compact .dropdown-item:hover {
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.online-indicator {
+    display: flex;
+    align-items: center;
+}
+
+[data-theme="dark"] .online-askers-compact .dropdown-item {
+    border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .online-askers-compact .dropdown-item:hover {
+    background-color: rgba(40, 167, 69, 0.2);
+}
+</style>
+
 <div class="container">
     <div class="row mb-4">
-        <div class="col-12">
+        <div class="col-md-8">
             <div class="card" style="min-height: auto; max-height: auto;"> 
                 <div class="card-body">
                     <h5 class="card-title">Welcome, <?php echo htmlspecialchars($_SESSION["username"]); ?>!</h5>
                     <p class="card-text">You are a specialist in <strong><?php echo htmlspecialchars($category['category_name']); ?></strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="online-askers-compact">
+                <div class="dropdown">
+                    <button class="btn btn-outline-success dropdown-toggle w-100" type="button" id="askersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-users me-2"></i>Online Students (<?php echo count($online_askers); ?>)
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end w-100" aria-labelledby="askersDropdown">
+                        <?php if(count($online_askers) > 0): ?>
+                            <?php foreach($online_askers as $asker): ?>
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" href="javascript:void(0)">
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold"><?php echo htmlspecialchars($asker['username']); ?></div>
+                                            <small class="text-muted">
+                                                <i class="fas fa-question-circle me-1"></i><?php echo $asker['total_questions']; ?> questions
+                                                <span class="ms-2">
+                                                    <i class="fas fa-clock me-1"></i><?php echo date('H:i', strtotime($asker['last_seen'])); ?>
+                                                </span>
+                                            </small>
+                                        </div>
+                                        <div class="online-indicator">
+                                            <i class="fas fa-circle text-success" style="font-size: 0.7rem;"></i>
+                                        </div>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li><span class="dropdown-item-text text-muted">No students online</span></li>
+                        <?php endif; ?>
+                    </ul>
                 </div>
             </div>
         </div>
